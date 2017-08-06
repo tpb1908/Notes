@@ -21,7 +21,7 @@ layout: default
 
     <div class="mdl-card__supporting-text" id="bottomremover">
       {% assign words = content | number_of_words %}
-      <p id="rightalign"><strong>{{ page.date | date: '%B %d, %Y' }}</strong>&emsp;•&emsp;{% include readtime.html %}<br><strong>Author:</strong> {% if page.author %} {{page.author}} {% else %} Theo {% endif %}</p>
+      <p id="rightalign"><strong>{{ page.date | date: '%d %B, %Y' }}</strong>&emsp;•&emsp;{% include readtime.html %}<br><strong>Author:</strong> {% if page.author %} {{page.author}} {% else %} Theo {% endif %}</p>
     </div>
 
     <div class="postcontent">
