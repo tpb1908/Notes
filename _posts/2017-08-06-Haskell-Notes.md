@@ -1,6 +1,7 @@
 ---
 layout: post
 color: "#607d8b"
+textcolor: "#FFFFFF"
 ---
 
 
