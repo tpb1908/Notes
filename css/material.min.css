@@ -191,7 +191,7 @@ h6 small {
     font-size: .6em
 }
 h1 {
-    font-size: 56px;
+    font-size: 45px;
     line-height: 1.35;
     letter-spacing: -.02em;
     margin: 24px 0
@@ -202,16 +202,16 @@ h2 {
     font-weight: 400
 }
 h2 {
-    font-size: 45px;
-    line-height: 48px
+    font-size: 34px;
+    line-height: 40px
 }
 h2,
 h3 {
     margin: 24px 0
 }
 h3 {
-    font-size: 34px;
-    line-height: 40px
+    font-size: 24px;
+    line-height: 32px
 }
 h3,
 h4 {
@@ -219,8 +219,8 @@ h4 {
     font-weight: 400
 }
 h4 {
-    font-size: 24px;
-    line-height: 32px;
+    font-size: 20px;
+    line-height: 38px;
     -moz-osx-font-smoothing: grayscale;
     margin: 24px 0 16px
 }
@@ -236,7 +236,7 @@ h6 {
     margin: 24px 0 16px
 }
 h6 {
-    font-size: 16px;
+    font-size: 14px;
     letter-spacing: .04em
 }
 h6,
@@ -245,9 +245,9 @@ p {
     line-height: 24px
 }
 p {
-    font-size: 14px;
+    font-size: 12px;
     letter-spacing: 0;
-    margin: 0 0 16px
+    margin: 0 0 14px
 }
 a {
     color: rgb(83, 109, 254);

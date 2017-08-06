@@ -4,10 +4,6 @@ color: "#607d8b"
 textcolor: "#FFFFFF"
 ---
 
-
-
-# Haskell notes
-
 **Notes from [learnyouahaskell](learnyouahaskell.com)**
 # Haskell
 
