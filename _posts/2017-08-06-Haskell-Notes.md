@@ -29,10 +29,10 @@ An infinite list of natural numbers can be generated as follows
 
 When we want to use these values we can write 
 
-```haskell
+{$ highlight haskell %}
 > take 10 naturals
 > [1,2,3,4,5,6,7,8,9,10]
-```
+{$ endhighlight $}
 
 We could more succintly use the notation for a range
 
