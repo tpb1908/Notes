@@ -1,6 +1,6 @@
 ---
 layout: page
-title: About this blog
+title: About these notes
 color: "#7B1FA2"
 textcolor: white
 ---
