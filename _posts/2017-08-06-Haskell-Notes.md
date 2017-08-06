@@ -8,10 +8,6 @@ textcolor: "#FFFFFF"
 
 # Haskell notes
 
-<script type="text/javascript" async
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
 **Notes from [learnyouahaskell](learnyouahaskell.com)**
 # Haskell
 
