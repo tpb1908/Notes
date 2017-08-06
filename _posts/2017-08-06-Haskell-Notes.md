@@ -1,3 +1,10 @@
+---
+layout: post
+color: "#607d8b"
+---
+
+
+
 # Haskell notes
 
 <script type="text/javascript" async
