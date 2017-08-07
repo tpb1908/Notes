@@ -47,7 +47,13 @@ title {
 
 
 table, th, td {
-   border: 1px solid #dfe2e5;
+  border: 1px solid #dfe2e5;
+  border-collapse: collapse;
+  padding: 6px 13px;
+  padding-top: 6px;
+  padding-right: 13px;
+  padding-bottom: 6px;
+  padding-left: 13px;
 }
 
 .mdl-layout__header > .mdl-layout__header-row > .mdl-layout-title {
