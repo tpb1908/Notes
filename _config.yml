@@ -14,6 +14,10 @@ kramdown:
 tipue_search:
   include:
     pages: true
+  exclude:
+    files: [head.html]
+    categories: [layouts]
+
 
 theme: minima
 
