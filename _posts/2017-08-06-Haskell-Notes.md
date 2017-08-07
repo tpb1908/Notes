@@ -838,3 +838,213 @@ The `fromIntegral` function has a type decleration of `fromInegral :: (Num b, In
 It takes an integral number and turns it into a more general number.
 
 ## Syntax in functions
+
+### Pattern matching
+
+Pattern matching is the process of specifying patterns to which data should conform and then checking to see if it does,
+deconstructing the data according to those patterns.
+
+When defining functions, separate bodies can be defined for different patterns.
+
+```haskell
+factorial :: (Integral a) => a -> a
+factorial 0 = 1
+factorial n = n * factorial(n - 1)
+```
+
+Pattern matching can fail.
+
+```haskell
+charName :: Char -> String
+charName 'a' = "Albert"
+charName 'b' = "Bert"
+charName 'c' = "Cecil"
+```
+
+When called with an unexpected input, and exception will be raised
+`Non-exhaustive patterns in function charName`
+
+Pattern matching can also be used on tuples.
+
+```haskell
+addVectors :: (Num a) => (a, a) -> (a, a) -> (a, a)
+addVectors a b = (fst a + fst b, snd a + snd b)
+```
+Using pattern matching we can instead write the function as
+
+```haskell
+addVectors (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
+```
+
+There are no provided functions to extract the components of triples, but they can be easily written.
+
+```haskell
+first :: (a, c, c) -> a
+first (x, _, _) = x
+
+second :: (a, b, c) -> b
+second (_, y, _) = y
+
+third :: (a, b, c) -> c
+third (_, _, z) = z
+```
+
+It is also possible to pattern match in list comprehensions.
+
+```haskell
+> let xs = [(1, 3), (4, 3), (2, 4), (5, 3), (5, 6), (3, 1)]
+> [a+b | (a, b) <- xs]
+> [4,7,6,8,11,4]
+```
+
+If a pattern match fails, it will move to the next element.
+
+We can pattern match against a list to make our own implementation of `head`
+
+```haskell
+head' :: [a] -> a
+head' [] = error "Empty list has no head"
+head' (x:_) = x
+```
+
+```haskell
+tell :: (Show a) => [a] -> String
+tell [] = "The list is empty"
+tell (x:[]) = "The list has one element: " ++ show x
+tell (x:y:[]) = "The list has two elements: " ++ show x ++ " and " ++ show y
+tell (x:y:_) = "The list is long. The first two elements are " ++ show x ++ " and " ++ show y
+```
+
+The `tell` function is safe because it handles the empty list, singleton list, two element list, and lists with more than two elements.
+
+We could rewrite `(x:[])` and `(x:y:[])` as `[x]` and `[x,y]` respectively.
+We cannot howver rewrite `(x:y:_)` with square brackets because it matches any list of length 2 or more.
+
+We can implement a recursive length function using list comprehension
+
+```haskell
+length' :: (Num b) => [a] -> b
+length' [] = 0
+length' (_:xs) = 1 + length` xs
+```
+
+We first define the result of a known input, the empty list. This is known as the edge condition.
+In the second pattern we split the list into a head and a tail, and then state that the length is 1 plus
+the length of the tail.
+
+```haskell
+sum' :: (Num a) => [a] -> a
+sum' [] = 0
+sum' (x:xs) = x + sum` xs
+```
+
+### Patterns
+
+Patterns are a method of breaking something up according to a pattern and binding it to names whilst still keeping a refernce to the whole thing.
+
+`xs@(x:y:ys)` will match exactly the same thing as `x:y:ys` but the whole list can be accessed via `xs` instead of repeatedly typing `x:y:ys` within
+the function body.
+
+```haskell
+capital :: String -> String
+capital "" = "Empty string"
+capital all@(x:xs) = "The first letter of " ++ all ++ " is " + [x]
+```
+
+Patterns can be usd to avoid needless repetition.
+
+Note that `++` cannot be used in pattern matching.
+
+### Guards
+
+While patterns make sure a value conforms to some form and allow destrucuting it, guards are a way of testing whether some property or properties
+of a value are true or false.
+Guards are much more readable that a statement when there are several conditions.
+
+```haskell
+bmi :: (RealFloat a) => a -> String
+bmi i
+  | i <= 18.5 = "Underweight"
+  | i <= 25 = "Normal"
+  | i <= 30 "Fat"
+  | i <= "Land whale"
+```
+
+Guards are indicated by pipes that follow a function's name and its parameters.
+They are usually indented.
+
+A guard is basically a boolean expression. If it evaluates to `True`, the corresponding body is used.
+Otherwise, the next guard is evaluated.
+
+The last guard will often be `otherwise`. `otherwise` is simpy an alias for `True`, and catches everything.
+
+If all the guards of a function evaluate to `False` and there is no `otherwise` guard, evaluation falls through
+to the next pattern. If no suitable guards or patterns are found, an error is thrown.
+
+Guards can also be writen inline, althought it is less readable.
+
+```haskell
+max' :: (Ord a) => a -> a -> a
+max' a b | a > b = a | otherwise = b
+```
+
+```haskell
+compare' :: (Ord a) => a -> a -> Ordering
+a `compare` b
+  | a > b = GT
+  | a == b = EQ
+  | otherwise = LT
+```
+
+### where
+
+Take note of the repetition in the function below
+
+```haskell
+bmi :: (RealFloat a) => a -> a -> String
+bmi weight height
+  | weight / height ^2 <= 18.5 = "Underweight"
+  | weight / height ^2 <= 25 = "Normal"
+  | weight / height ^2 <= 30 = "Overweight"
+  | otherwise = "Land whale"
+```
+
+Rather than repeating the bmi calculation, we can use the where keyword.
+
+```haskell
+bmi weight height
+  | i <= 18.5 = "Underweight"
+  | i <= 25 = "Normal"
+  | i <= 30 = "Overweight"
+  | otherwise = "Land whale"
+  where i = weight / height ^2
+```
+
+The value defined in `where` is visible across the guards.
+`where` bindings are not shared across function bodies of different patterns.
+If you want several patterns of one function to access a shared name, the name must be defined globally.
+
+We could also write a pattern match.
+
+```haskell
+where bmi = weight / height ^2
+  (underweight, normal, overweight) = (18.5, 25, 30)
+```
+
+
+Another trivial function might five someone their initials
+
+```haskell 
+initials :: String -> String -> String
+initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
+  where (f:_) = firstname
+        (l:_) = lastname  
+```
+
+In the same way that we have defined constants in `where` blocks, we can also define functions.
+
+```haskell
+calcBmis :: (RealFloat a) => [(a, a)] -> [a]
+calcBmis xs = [bmi w h | (w, h) <- xs]
+  where bmi weight height = weight / height ^2
+```
