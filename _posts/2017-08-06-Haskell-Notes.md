@@ -27,7 +27,7 @@ An infinite list of natural numbers can be generated as follows
 > let naturals = 1 : map (+1) naturals
 ```
 
-When we want to use these values we can write 
+When we want to use these values we can write
 
 {% highlight haskell %}
 > take 10 naturals
@@ -63,7 +63,7 @@ If a function takes two parameters and adds them together, their types do not ne
 > 19
 > 27 * 53
 > 1431
-> 1314 - 133 
+> 1314 - 133
 > 1181
 > 7 / 2
 > 3.5
@@ -85,9 +85,9 @@ Instead `5 * (-3)` should be written
 
 ## Examples: Boolean algebra
 
-| Operator | Symbol | 
-| -------- | -------- | 
-| And     | &&     | 
+| Operator | Symbol |
+| -------- | -------- |
+| And     | &&     |
 | Or | \|\| |
 | Not | not |
 | Equality | == |
@@ -224,7 +224,7 @@ The function `doubleSmallNumber` doubles the parameter `x` if `x<=100`, otherwis
 
 An if statement in Haskell is an expression, a piece of code which returns a value. Because the else is mandatory, an if statement will always return some value.
 
-If we wanted to add one to the return value in `doubleSmallNumber` we could write 
+If we wanted to add one to the return value in `doubleSmallNumber` we could write
 
 ```haskell
 doubleSmallNumber' x = (if x > 100 then x else x * 2) + 1
@@ -234,7 +234,7 @@ doubleSmallNumber' x = (if x > 100 then x else x * 2) + 1
 
 The function above `doubleSmallNumber'` has a `'` character as its last character. This is a valid character in Haskell function names and is often used to denote a stricter, non-lazy version of a function, or a slightly modified version.
 
-Haskell functions cannot begin with uppercase characters. 
+Haskell functions cannot begin with uppercase characters.
 
 When a function does not take any parameters, it is called a **definition** or a **name**.
 
@@ -306,7 +306,7 @@ Lists can be infinitely nested within memory constraints.
 > [6,6,6]:b
 > [[6,6,6],[1,2,3,4],[5,3,3,3],[1,2,2,3,4],[1,2,3]]
 > b !! 2
-> [1,2,2,3,4] 
+> [1,2,2,3,4]
 ```
 
 The nested lists can be of different dimensions, but they must be of the same type.
@@ -413,7 +413,7 @@ If we try to take more elements than there are in the list, it just returns the 
 > 9
 ```
 
-**sum** takes a list of numbers as a parameter and returns their sum 
+**sum** takes a list of numbers as a parameter and returns their sum
 
 ```haskell
 > sum [1,2,3,4,5]
@@ -618,7 +618,7 @@ There is no singleton tuple. This is because a singleton tuple would just be the
 
 These functions only work on pairs. They will not work on triples, 4-tuples, 5-tuples etc.
 
-**zip** takes two lists and produces a list of pairs 
+**zip** takes two lists and produces a list of pairs
 
 ```haskell
 > zip [1,2,3,4,5] [5,4,3,2,1]

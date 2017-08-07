@@ -41,7 +41,9 @@ PLATFORMS
 DEPENDENCIES
   jekyll (= 3.2.1)
   jekyll-paginate
+  kramdown
   minima
+  rouge
 
 RUBY VERSION
    ruby 2.3.1p112
