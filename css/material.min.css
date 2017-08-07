@@ -249,7 +249,7 @@ p {
     letter-spacing: 0;
     margin: 0 0 14px
 }
-a :not(.anchor) {
+a :not(.anchor) :not(.mdl-layout-title) {
     color: rgb(83, 109, 254);
     font-weight: 500
 }
@@ -2748,7 +2748,8 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     background-color: #dedede;
     display: inline-block;
     color: rgba(0, 0, 0, .87);
-    margin: 2px 0;
+    margin-left: 2px;
+    margin-right: 2px;
     font-size: 0;
     white-space: nowrap
 }
@@ -3349,7 +3350,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
 }
 .mdl-list {
     display: block;
-    padding: 8px 0;
+    padding: 16px;
     list-style: none
 }
 .mdl-list__item {
@@ -3832,6 +3833,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     position: relative;
     font-family: "Roboto", "Helvetica", "Arial", sans-serif;
     font-size: 20px;
+    color: #fff;
     line-height: 1;
     letter-spacing: .02em;
     font-weight: 400;
