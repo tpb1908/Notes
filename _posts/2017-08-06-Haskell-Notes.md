@@ -4,7 +4,7 @@ color: "#607d8b"
 textcolor: "#FFFFFF"
 ---
 
-**Notes from [learnyouahaskell](learnyouahaskell.com)**
+**Notes from [learnyouahaskell](http://learnyouahaskell.com)**
 # Haskell
 
 ## Purely functional languages
