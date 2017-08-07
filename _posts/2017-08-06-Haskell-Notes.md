@@ -2,6 +2,7 @@
 layout: post
 color: "#607d8b"
 textcolor: "#FFFFFF"
+tags: [Notes, Haskell, Functional]
 ---
 
 **Notes from [learnyouahaskell](http://learnyouahaskell.com)**

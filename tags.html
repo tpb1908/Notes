@@ -1,0 +1,29 @@
+---
+layout: default
+title: Tag
+---
+
+<div class="mdl-layout">
+    <div class="tags mdl-grid">
+      {% assign sorted_tags = site.tags | sort  %}
+      {% for tag in sorted_tags %}
+      <span class="mdl-chip"><a class="mdl-chip__text" href="#{{ tag[0] | slugify }}" class="post-tag">{{ tag[0] }}</a></span>
+      {% endfor %}
+    </div>
+    <ul class="mdl-list">
+    {% assign word_count = 10%}
+    {% assign small = true %}
+    {% for tag in sorted_tags %}
+        <li>
+          <h2 id="{{ tag[0] | slugify }}">{{ tag[0] }}</h2><br>
+          <div class="mdl-grid">
+
+              {% for p in tag[1] %}
+                {% assign post = p%}
+                {% include post_card.html %}
+              {% endfor %}
+          </div>
+      </li>
+      {% endfor %}
+    </ul>
+</div>
