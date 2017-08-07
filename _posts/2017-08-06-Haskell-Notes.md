@@ -638,3 +638,203 @@ We can apply `zip` to pairings of finite and infinite lists, or two infinite lis
 ```
 
 ## Types and typeclasses
+
+The `:t` command can be used to determine the type of an expression.
+
+```haskell
+> :t 'a'
+> 'a' :: Char
+> :t True
+> True :: Bool
+> :t (True, 'a')
+> (True, 'a') :: (Bool, Char)
+> :t 4 == 5
+> 4 == 5 :: Bool
+```
+
+`::` should be read as 'has type of'.
+Explicit types are always denoted with the first letter in capital case.
+
+Functions also have types. When writing functions, we can give an explicit type declaration.
+
+```haskell
+removeNonUpercase :: [Char] -> [Char]
+removeNonUpercase st = [ c | c <- st, c `elem` ['A'..'Z']]
+```
+
+`removeNonUpercase` has a type of `[Char] -> [Char]` as it maps a string to a string.
+We don't have to give this function a type decleration because the compiler can infer it, however it is still good practice to do so.
+
+```haskell
+addThree :: Int -> Int -> Int -> Int
+addThree x y z  = x + y + z
+```
+
+The function above takes three parameters.
+The return type is the last item in the declaration and the parameters are the first three.
+
+### Common types
+
+**Int** A 32 or 64 bit signed integer
+
+**Integer** A non-bounded integer
+
+**Float** A real floating point value with single precision
+
+**Double** A real floating point value with double preceision
+
+**Bool** A boolean type, `True` or `False`
+
+**Char** Represents a single character
+
+### Type variables
+
+`head` takes a list of any type and returns the first element
+
+```Haskell
+> :t head
+> head :: [a] -> a
+```
+
+`a` is a type variable, meaning that it can be of any type.
+The type decleration of `head` means that it takes a list of some type `a` and returns a single instance of type `a`.
+
+This is much like generics in other languages.
+
+Functions that have type variables are called polymorphic functions.
+
+```haskell
+> :t fst
+> fst :: (a, b) -> a
+```
+
+`fst` takes a tuple which conatins two types, and returns an element which is of the same type as the first item in the pair.
+
+Note that despite the differing names of `a` and `b` they can be the same type.
+
+### Typeclasses
+
+A typeclass behaves similarly to an interface.
+If a type is part of a typeclass, it supports and implements the behaviour that the typeclass describes.
+
+```haskell
+> :t (==)
+> (==) :: (Eq a) => a -> a -> -> Bool
+```
+
+The `=>` symbol is called a class constraint.
+The euqality function takes any two values that are of the same type and returns a `Bool`.
+The class constraint is that the type of those two values must be a member of the `Eq` class.
+
+The `Eq` typeclass provides an interface for testing for equality.
+Any type where it makes sense to test for equality between two values of that type should be a member
+of the `Eq` class.
+All standard Haskell types except for IO and functions are part of the `Eq` typeclass.
+
+Consider the `elem` function which has a type of `(Eq a) => a -> [a] -> Bool` because it uses `==` over a list to check whether some value is contained.
+
+#### Common Typeclasses
+
+**Eq** Used for types that support equality testing. Members must implement `==` and `/=`
+
+**Ord** Used for types which have ordering. `Ord` covers `>, <, >=, ` and `<=`
+
+The `compare` function takes two `Ord` members of the same type and returns an ordering.
+`Ordering` is a type that can be `GT`, `LT`, or `EQ`.
+
+To be a member of `Ord`, a type must first be a member of `Eq`
+
+**Show** Used for types that can be presented as strings. The most used function that deals with `Show` is `show`/
+It takes a value whose type is a member of `Show` and presents it as a string.
+
+**Read** The `read` function takes a string and returns a type which is a member of `Read`
+
+```haskell
+> read "True" || False
+> True
+> read "8.2" + 3.8
+> 12.0
+> read "[1,2,3,4]" ++ [3]
+> [1,2,3,4,3]
+```
+
+If we try `read "4"` an exception will be raised.
+```haskell
+<interactive>:1:0:  
+    Ambiguous type variable `a' in the constraint:  
+      `Read a' arising from a use of `read' at <interactive>:1:0-7  
+    Probable fix: add a type signature that fixes these type variable(s)
+```
+
+The return type cannot be determined. Previously our use of the return value could be used to determine its type.
+
+```haskell
+> :t read
+> read :: (Read a) => String -> a
+```
+
+`read` returns a type that is part of `Read`, but if we do not use the value the type cannot be determined.
+We can use explicit type annotations to overcome this problem.
+
+```haskell
+> read "5" :: Int
+> 5
+> read "5" :: Float
+> 5.0
+> read "(3, 'a')" :: (Int, Char)
+> (3, 'a')
+```
+
+Most expressions provide sufficient detail that the compiler can infer what their type is by itself.
+
+**Enum** Enum members are sequentially ordered types.
+
+The `Enum` typeclass can be used in list ranges. They also have defined successors and predecessors.
+`(), Bool, Char, Ordering, Int, Integer, Float`, and `Double` are in this class.
+
+```haskell
+> ['a'..'e']
+> "abcde"
+> [LT..GT]
+> [LT, EQ, GT]
+> succ 'B'
+> 'C'
+```
+
+**Bounded** Members of this typeclass have an upper and lower bound.
+
+Both `minBound` and `maxBound` have a type of `(Bounded a) => a`.
+Tuples are part of `Bounded` if all of their components are.
+
+```haskell
+> minBound :: Int
+> -2147483648
+> maxBound :: Bool
+> True
+> maxBound :: (Bool, Int, Char)
+> (True, 2147483647, '\1114111')
+```
+
+**Num** Is a numeric typeclass. Its members have the property of being able to act like numbers.
+
+Whole numbers are polymorphic constants. They can act like any type that's a member of the `Num` typeclass.
+
+If we examine the type of `*` we can see that it accepts all numbers.
+
+```haskell
+> :t (*)
+> (*) :: (Num a) => a -> a -> a
+```
+
+As `*` takes two numbers of the same type, `(5 :: Int) * (6 :: Integer)` will result in an error.
+
+To be part of `Num`, a type must also be part of `Show` and `Eq`.
+
+**Integral** Is a numeric typeclass containing `Int` and `Integer`
+
+**Floating** Is a numeric typeclass containing `Float` and `Double`
+
+The `fromIntegral` function has a type decleration of `fromInegral :: (Num b, Integral a) => a -> b`.
+It takes an integral number and turns it into a more general number.
+
+## Syntax in functions
