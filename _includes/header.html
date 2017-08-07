@@ -1,24 +1,29 @@
 <header>
   <div class="nav-layout-transparent mdl-layout mdl-js-layout">
-    <header class="mdl-layout__header mdl-layout__header--transparent">
-      <div class="mdl-layout__header-row">
-        <a class="title" href="{{ " / " | relative_url }}"><span class="mdl-layout-title">Theo's Notes</span></a>
-        <!-- To align navigation to the right -->
-        <div class="mdl-layout-spacer"></div>
-        <!-- Navigation -->
-        <nav class="mdl-navigation">
-          <a class="mdl-navigation__link" href="{{ "/" | relative_url }}">Home</a>
-          <a class="mdl-navigation__link" href="{{ "/about " | relative_url }}">About</a>
-          <a class="mdl-navigation__link" href="{{ "/#" | relative_url }}">Another</a>
-        </nav>
-      </div>
-    </header>
-    <div id="drawer" class="mdl-layout__drawer">
+  <header class="mdl-layout__header mdl-layout__header--transparent">
+    <div class="mdl-layout__header-row">
+      <a class="title" href="{{ "/" | relative_url }}"><span class="mdl-layout-title">Theo's Notes</span></a>
+      <!-- To align navigation to the right -->
+      <div class="mdl-layout-spacer"></div>
+      <!-- Navigation -->
       <nav class="mdl-navigation">
-        <a class="mdl-navigation__link" href="{{ " / " | relative_url }}">Home</a>
-        <a class="mdl-navigation__link" href="{{ " /about " | relative_url }}">About</a>
-        <a class="mdl-navigation__link" href="{{ " /# " | relative_url }}">Another</a>
+        <a class="mdl-navigation__link" href="{{ "/" | relative_url }}">Home</a>
+        <a class="mdl-navigation__link" href="{{ "/about" | relative_url }}">About</a>
+        <a class="mdl-navigation__link" href="{{ "/#" | relative_url }}">Another</a>
       </nav>
     </div>
+  </header>
+  <div id="drawer" class="mdl-layout__drawer">
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="{{ "/" | relative_url }}">Home</a>
+      <a class="mdl-navigation__link" href="{{ "/about" | relative_url }}">About</a>
+      <a class="mdl-navigation__link" href="{{ "/#" | relative_url }}">Another</a>
+    </nav>
   </div>
+
+  <main class="mdl-layout__content">
+  </main>
+</div>
+
+
 </header>
