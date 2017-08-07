@@ -249,7 +249,7 @@ p {
     letter-spacing: 0;
     margin: 0 0 14px
 }
-a {
+a :not(.anchor) {
     color: rgb(83, 109, 254);
     font-weight: 500
 }

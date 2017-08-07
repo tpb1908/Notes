@@ -5,6 +5,14 @@ layout: default
 <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
+<script type="text/javascript">
+  $(function() {
+    $('.postcontent').anchorific();
+    console.log("Script running")
+  });
+
+</script>
+
 <div class="posts mdl-grid">
   <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
     <div class="coloredtop" {% if page.color %} style="background-color: {{ page.color }};" {% else %} style="background-color: #333;" {% endif %}>
@@ -40,7 +48,8 @@ layout: default
               <i class="material-icons">arrow_back</i>
             </button>
             Older
-          </a> {% endif %} {% if page.next %}
+          </a> {% endif %}
+    {% if page.next %}
     <div class="section-spacer"></div>
     <a href="{{ page.next.url | prepend: site.baseurl }}" class="bottom-nav__button">
             Newer
