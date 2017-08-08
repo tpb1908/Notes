@@ -26,10 +26,9 @@ layout: default
     console.log(headers);
     var toc = '<ul class="mdl-list">';
     headers.each(function(i, elem) {
-      var perc = (100 - 10*(elem.tagName[1]-1));
-      toc += '\n<li class="mdl-list__item" style="height:' + perc +  '%;">\n';
-      var size =  'style="font-size: ' + perc + '%;">'
-      toc += elem.innerHTML.replace('>', size);
+      var depth = elem.tagName[1];
+      toc += '\n<li class="mdl-list__item">\n'
+      toc += elem.innerHTML.replace('>', 'style="margin-left: ' + (10*depth) + 'px;">');
       toc += '\n</li>';
     })
     toc += "</ul>";
