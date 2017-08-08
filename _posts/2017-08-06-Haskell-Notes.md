@@ -1034,7 +1034,7 @@ where bmi = weight / height ^2
 
 Another trivial function might five someone their initials
 
-```haskell 
+```haskell
 initials :: String -> String -> String
 initials firstname lastname = [f] ++ ". " ++ [l] ++ "."
   where (f:_) = firstname
@@ -1048,3 +1048,224 @@ calcBmis :: (RealFloat a) => [(a, a)] -> [a]
 calcBmis xs = [bmi w h | (w, h) <- xs]
   where bmi weight height = weight / height ^2
 ```
+
+### Let it be
+
+`let` bindings are very similar to `where` bindings.
+`let` bindings allow you to bind variaables anywhere and are themselves expressions.
+They do not span across guards.
+
+```haskell
+cyclinder :: (RealFloat a) => a -> a -> a
+cylinder r h =
+  let sideArea = 2 * pi * r * h
+      topArea = pi * r^2
+  in sideArea + 2 * topArea
+```
+
+A `let` binding is of the form `let <bindings> in <expression>`.
+The names defined in the binding are accessible in the expression.
+
+This is similar to splitting up a calculation in another language.
+
+```kotlin
+fun cylinder(r: Int, h: Int): Float {
+  val sideArea = 2 * Math.PI * r * h
+  val topArea = Math.PI * r * r
+  return sideArea + 2 * topArea
+}
+```
+
+The difference between `where` and `let` bindings is that while `where` bindings are just syntactic constructs,
+`let` bindings are actually expressions.
+
+`let` bindings can be used almost anywhere, in the same way as `if` statements.
+
+```haskell
+> 4 * (let a = 9 in a + 1) + 2
+> 42
+> [let square x = x * x in (square 5, square 3, square 2)]
+> [(25, 9, 4)]
+```
+
+If we want to bind several variables in line, we can separate them with semicolons.
+
+```haskell
+> (let a = 100; b = 200; c = 300 in a*b*c, let foo="Hey"; bar = "there!" in foo ++ bar)
+> (6000000, "Hey there!")
+```
+
+`let` bindings are very useful for quckly dismantling a tuple into components and binding them to names.
+
+```haskell
+> (let (a,b,c) = (1,2,3) in a+b+c)*100
+> 600
+```
+
+`let` bindings can also be used inside list comprehensions.
+
+```haskell
+calcBmis :: (RealFloat a) => [(a, a)] -> [a]
+calcBmis xs = [bmi | (w, h) <- xs, let bmi = w /h^2]
+```
+
+We use `let` in a similar way to a predicate, the difference being that we do not filter the list.
+The names defined in a `let` are visible to the output function and all predicates and secitons that come after the binding.
+
+```haskell
+listOverweight :: (RealFloat a) => [(a, a)] -> [a]
+listOverweight xs :: [bmi | (w, h) <- xs, let bmi = w / h^2, bmi >= 25]
+```
+
+We ommited the `in` part of the binding because the scope of the names is already predefined.
+If we used `let in`, the names would only be visible to that predicate.
+
+### Case expressions
+
+The syntax for a case expression is simple
+
+```haskell
+case expression of pattern -> result
+                   pattern -> result
+                   pattern -> result
+                   ...
+
+```
+
+`expression` is matched against the patterns. The first pattern that matches the expression is used.
+If it falls through the whole `case` an exception occurs.
+
+Whereas pattern matching on function parameters can only be done when defining functions, case expressions can be used
+pretty much anywhere.
+They are useful for pattern matching against something in the middle of an expression.
+
+## Recursion
+
+The `maximum` function takes a list of instances of the `Ord` typeclass, and returns the largest of them.
+
+In an imperative language you might define this function as so
+
+```kotlin
+fun maximum(items: Array<Int>): Int {
+  var max = Integer.MIN_VALUE
+  items.forEach {
+    if (it > max) {
+      max = it
+    }
+  }
+  return max
+}
+```
+
+In Haskell we might instead write our `maximum` function as follows
+
+```haskell
+maximum' :: (Ord a) => [a] -> a
+maximum' [] = error "Empty list"
+maximum' [x] = x
+maximum' (x:xs)
+    | x > maxTail = x
+    | otherwise = maxTail
+    where maxTail = maximum' xs
+```
+
+We split the list into a head and a tail, and then compare the head to the maximum of the tail.
+
+Consider `[2, 5, 1]`.
+We reach the `(x:xs)` branch with a head of `2` and a tail of `[5, 1]`.
+`maximum'` is called on `[5, 1]`, reaching the same branch with a head of `5` and a tail of `[1]`.
+`maximum'` is called once more on `[1]` which returns `1`.
+We now cascade back up the call stack, comparing the head `5` to `1`, giving `5`
+and then comparing `5` (`maxTail`) to `2` and returning `5`.
+
+The function could be written more elegantly using `max`.
+
+```haskell
+maximum' :: (Ord a) => [a] -> a
+maximum' [] = error "Empty list"
+maximum' [x] = x
+maximum' (x:xs) - max x (maximum' xs)
+```
+
+### Recursive function Examples
+
+
+**Repliate**
+
+```haskell
+replicate' :: (Num i, Ord i) => i -> a -> [a]
+replicate' n x
+  | n <= 0 = []
+  | otherwise x:replicate` (n-1) x
+```
+
+As we are testing boolean expressions we used guards.
+As `Num` is not a subclass of `Ord` we have to specify both class constraints.
+
+**Take**
+
+```haskell
+take' :: (Num i, Ord i) => i -> [a] -> [a]
+take` n _
+  | n <= 0 = []
+take` _ [] = []
+take` n (x:xs) = x:take` (n-1) xs
+```
+
+The first pattern deals with negative values, the second with empty lists, and the third with lists containing some number of items.
+As our guard has no `otherwise`, the the matching will fall through when `n > 0`.
+
+**Reverse**
+
+```haskell
+reverse' :: [a] -> [a]
+reverse' [] = []
+reverse' (x:xs) = reverse' xs ++ [x]
+```
+
+**Repeat**
+
+`repeat` takes an element and returns an infinite list of that element.
+
+```haskell
+repeat' :: a -> [a]
+repeat' x = x:repeat x
+```
+
+**Repeat**
+
+`zip` takes two lists and zips them together to a list of pairs.
+
+```haskell
+zip' :: [a] -> [b] -> [(a, b)]
+zip' _ [] = []
+zip' [] _ = []
+zip' (x:xs) (y:ys) = (x,y):zip xs ys
+```
+
+**Elem**
+
+```haskell
+elem' :: a -> [a] -> Bool
+elem' a [] = False
+elem' a (x:xs)
+  | a == x = True
+  | otherwise = a `elem` xs
+```
+
+### Quick sort
+
+Implementing QuickSort is much easier in Haskell than in imperative langauges.
+
+```haskell
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) =
+  let smallerSorted = quicksort [a | a <- xs, a <= x]
+      biggerSorted = quicksort [a | a <- xs, a <= x]
+  in smallerSorted ++ [x] ++ biggerSorted
+```
+
+This Quicksort implementation uses the head as a pivot for the sorting.
+
+## Higher order functions
