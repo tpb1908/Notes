@@ -1268,3 +1268,209 @@ quicksort (x:xs) =
 This Quicksort implementation uses the head as a pivot for the sorting.
 
 ## Higher order functions
+
+Functions in Haskell can take functions as parameters and return functions.
+A function that does either of those is called a higher order function.
+
+### Curried functions
+
+Every function in Haskell only takes one parameter.
+All the functions which take several parameters are curried functions.
+
+The following two calls are equivelant
+
+```haskell
+> max 4 5
+> (max 4) 5
+```
+
+Calling `max 4 5` first creates a function which takes a single parameter and returns
+either `4` or that parameter, whichever is larger. It then applies that function to `5`.
+
+Putting a space between two pieces of code is simply function application.
+The space is like an operator with the highest precedence.
+
+Again considering `max`
+
+```haskell
+max :: (Ord a) => a -> a-> a
+max :: (Ord a) => a -> (a -> a)
+```
+
+The second line could be read as `max` takes an `a` and returns a function that takes another `a` and returns an `a`.
+The return type of each functions are separated with the arrows.
+
+Consider the following function
+
+```haskell
+multThree :: (Num a) => a -> a -> a -> a
+multThree x y z = x * y * z
+```
+
+When we call `multThree 3 5 9` we are actually calling `((multThree 3) 5) 9`.
+This means that `3` is applied to `multThree` to create a function that takes one
+parameter and returns a function.
+Next, `5` is applied to that function, and returns a function which takes a single parameter
+and multiplies it by `15`.
+Finally, `9` is applied to that function and the result is `135`.
+
+By calling functions without some of their parameters, we can create new functions.
+
+```haskell
+> let multTwoWithNine = multThree 9
+> multTwoWithNine 2 3
+> 54
+> let multWithEighteen = multTwoWithNine 2
+> multWithEighteen 10
+> 180
+```
+
+Infix functions can also be partially applied by using sections.
+To section an infix function, surround it with parentheses and only supply a parameter on one side.
+
+```haskell
+divTen :: (Floating a) => a -> a
+divTen = (/10)
+isUpperAlphanum :: Char -> Bool
+isUpperAlphanum = ('elem' ['A'..'Z'])
+```
+
+Note that when using sections, `-` cannot be used directly.
+`(-4)` means `-4`. To make a function which takes a value and subtracts `4` from it
+you must replace the `-` with `subtract`, `(subtract 4)`.
+
+### Higher order functions
+
+```haskell
+applyTwice :: (a -> a) -> a -> a
+applyTwice f x = f (f x)
+```
+
+Notice that the type decleration contains parentheses.
+They are mandatory when one of the parameters is a function.
+
+```haskell
+> applyTwice (+4) 10
+> 18
+```
+
+We can now re-implement another standard library function, `zipWith`.
+`zipWith` takes a function and two lists as parameters and then joins the two
+lists by applying the function between corresponding elements.
+
+
+```haskell
+zipWith' (a -> b -> c) -> [a] -> b -> [c]
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+```
+
+In the type decleration the first parameter is a function that takes two things and produces a third.
+The second and third parameters are lists, and the return value is a list, with each list matching
+the respective types of the arguments of the first function.
+
+```haskell
+> zipWith' (+) [4,2,5,6] [2,6,2,3]
+> [6,8,7,9]
+```
+
+Another standard library function is `flip`. It takes a function and returns a function
+which is like the original function, but with the first two arguments flipped.
+
+```haskell
+flip' :: (a -> b -> c) -> (b -> a -> c)
+flip' f = g
+  where g x y = f y x
+```
+
+Reading the type decleration we say that `flip'` takes a function that takes an `a` and a `b`, and
+returns a function that takes a `b` and an `a`.
+Because functions are curried by default, the second pair of parentheses is really unnecessary, because `->`
+is right associative by default.
+
+`(a -> b -> c) -> (b -> a -> c)` is the same as `(a -> b -> c) -> (b -> (a -> c))` which is the same as
+`(a -> b -> c) -> b -> a -> c`.
+
+We can further simplify the function by writing it as
+
+```haskell
+flip' :: (a -> b -> c) -> b -> a -> c
+flip' f y x = f x y
+```
+### Maps and filters
+
+**map** Takes a function and a list and applies that fuction to every element in the list, producing a new list.
+
+The definition of `map` is
+
+```haskell
+map :: (a -> b) -> [a] -> [b]
+map _ [] = []
+map f (x:xs) = f x : map f xs
+```
+
+```haskell
+> map (+2) [1,2,3,4]
+> [3,4,5,6]
+```
+
+This is much more readable than the equivelant list comprehension `[x+2 | x <- [1,2,3,4]]`.
+
+**filter** is a function that takes a predicate and a list and returns the elements of the list that satisfy the predicate
+
+```haskell
+filter :: (a -> Bool) -> [a] -> [a]
+filter _ [] = []
+filter p (x:xs)
+  | p x = x : filter p xs
+  | otherwise = filter p xs
+```
+
+```haskell
+> filter (>3) [1,2,3,4,5,6,7,8,9]
+> [4,5,6,7,8,9]
+> let notNull x = not (null x) in filter notNull [[1,2,3],[],[3,4,5],[2,2],[],[]]
+> [[1,2,3],[3,4,5],[2,2]]
+```
+
+Recalling the earlier implementation of QuicSort, we can replace the list comprehensions with calls to filter.
+
+```haskell
+quicksort :: (Ord a) => [a] -> [a]
+quicksort [] = []
+quicksort (x:xs) =
+  let smallerSorted = quicksort (filter (<=x) xs)
+      biggerSorted = quicksort (filter (>x) xs)
+  in smallerSorted ++ [x] ++ biggerSorted
+```
+
+**takeWhile** is a funciton that takes a list and a predicate and returns all of the elements from the start of the
+list while the predicate returns true
+
+Suppose we wish to find the sum of all odd square that are less than `10000`
+
+```haskell
+> sum (takeWhile (<10000) (filter odd (map (^2) [1..])))
+> 166650
+```
+
+In the Collatz sequence, we start with a natural number.
+If the number is even we divide it by 2.
+If the number is odd we multiply it by 3 and add 1.
+We take the resulting value and apply the same process to it, stopping when we reach one.
+
+```haskell
+chain :: (Integral a) => a -> [a]
+chain 1 = [1]
+chain n
+  | even n = n:chain (n / 2)
+  | odd n = n:chain (n*3 + 2)
+```
+
+```haskell
+> chain 10
+> [10, 5, 16, 8, 4, 2, 1]
+```
+
+### Lambdas
