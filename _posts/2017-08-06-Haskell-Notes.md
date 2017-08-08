@@ -1129,7 +1129,6 @@ case expression of pattern -> result
                    pattern -> result
                    pattern -> result
                    ...
-
 ```
 
 `expression` is matched against the patterns. The first pattern that matches the expression is used.
