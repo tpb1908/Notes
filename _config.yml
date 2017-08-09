@@ -11,6 +11,7 @@ kramdown:
   auto_ids: true
   syntax_highlighter: rouge
 
+
 tipue_search:
   include:
     pages: true
