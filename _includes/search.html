@@ -1,8 +1,8 @@
 
 <div class="search">
-  <script async src="{{ "/assets/tipuesearch/tipuesearch_content.js" | relative_url }}"></script>
-  <script async src="{{ "/assets/tipuesearch/tipuesearch_set.js" | relative_url }}" defer='defer'></script>
-  <script async src="{{ "/assets/tipuesearch/tipuesearch.min.js" | relative_url }}" defer='defer'></script>
+  <script defer src="{{ "/assets/tipuesearch/tipuesearch_content.js" | relative_url }}"></script>
+  <script defer src="{{ "/assets/tipuesearch/tipuesearch_set.js" | relative_url }}"></script>
+  <script defer src="{{ "/assets/tipuesearch/tipuesearch.min.js" | relative_url }}"></script>
   <form action="{{ page.url | relative_url }}" id="search_form">
     <div class="tipue_search_left"><img src="{{ "/assets/tipuesearch/search.png" | relative_url }}" class="tipue_search_icon"></div>
     <div class="tipue_search_right "><input class="mdl-textfield__input"type="text" name="q" id="tipue_search_input" pattern=".{3,}" title="At least 3 characters" required></div>
@@ -11,13 +11,22 @@
 
   <div id="tipue_search_content"></div>
 
-<script async defer='defer'>
-  $(document).ready(function() {
-    $('#tipue_search_input').tipuesearch({
-      'wholeWords' : false,
-      'showURL' : false,
+<script defer>
+  function defer(method) {
+    if (window.jQuery) {
+        method();
+    } else {
+        setTimeout(function() { defer(method) }, 30);
+    }
+  }
+    defer(function() {
+      $(document).ready(function() {
+        $('#tipue_search_input').tipuesearch({
+          'wholeWords' : false,
+          'showURL' : false,
 
+        });
+      });
     });
-  });
   </script>
 </div>

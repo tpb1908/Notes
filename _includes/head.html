@@ -1,12 +1,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page.title }}</title>
 <link href="{{ "/assets/images/icon.png" | relative_url}}" rel="icon" type="image/x-icon" />
-<script async src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js">
-  WebFont.load({
-    google: {
-      families: ['Lobster', 'Roboto', 'Material+Icons']
-    }
-  });
+<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js">
+</script>
+<script>
+WebFont.load({
+  google: {
+    families: ['Lobster', 'Roboto', 'Material+Icons']
+  }
+});
 </script>
 
 <style type="text/css">
@@ -16,5 +18,5 @@
    {{ include_to_scssify | scssify }}
  </style>
 <script async src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script async type="text/javascript" src="{{ "assets/anchorific/anchorific.min.js" | relative_url }}" defer='defer'>
+<script type="text/javascript" src="{{ "assets/anchorific/anchorific.min.js" | relative_url }}">
 </script>
