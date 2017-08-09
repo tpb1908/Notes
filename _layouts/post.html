@@ -2,58 +2,6 @@
 layout: default
 ---
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" integrity="sha384-wITovz90syo1dJWVh32uuETPVEtGigN07tkttEqPv+uR2SE/mbQcG7ATL28aI9H0" crossorigin="anonymous">
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js" integrity="sha384-/y1Nn9+QQAipbNQWU65krzJralCnuOasHncUFXGkdwntGeSvQicrYkiUBwsgUqc1" crossorigin="anonymous"></script>
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/contrib/auto-render.min.js" integrity="sha384-dq1/gEHSxPZQ7DdrM82ID4YVol9BYyU7GbWlIwnwyPzotpoc57wDw/guX8EaYGPx" crossorigin="anonymous"></script>
-<script defer type="text/javascript">
-  function defer(method) {
-    if (window.jQuery && katex) {
-        method();
-    } else {
-        setTimeout(function() { defer(method) }, 5);
-    }
-  }
-  defer(function() {
-    $("script[type='math/tex']").replaceWith(function() {
-      var tex = $(this).text();
-      return katex.renderToString(tex, {displayMode: false});
-    });
-
-    $("script[type='math/tex; mode=display']").replaceWith(function() {
-        var tex = $(this).html();
-        return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
-    });
-
-    $(function() {
-      $('.postcontent').anchorific();
-
-      var $sheet = $('.mdl-sheet');
-      if ($sheet.length > 0) {
-        $('html').on('click', function() {
-          $sheet.removeClass('mdl-sheet--opened')
-        });
-
-        $sheet.on('click', function(event) {
-          event.stopPropagation();
-
-          $sheet.addClass('mdl-sheet--opened');
-        });
-      }
-
-      var headers = $(":header");
-      var toc = '<ul class="mdl-list">';
-      headers.each(function(i, elem) {
-        var depth = elem.tagName[1];
-        toc += '\n<li class="mdl-list__item">\n'
-        toc += elem.innerHTML.replace('>', 'style="margin-left: ' + (10*depth) + 'px;">');
-        toc += '\n</li>';
-      })
-      toc += "</ul>";
-      $("#toc").html(toc);
-
-    });
-  });
-</script>
 
 <div class="posts mdl-grid">
   <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
@@ -108,3 +56,56 @@ layout: default
     <div id="toc" class="mdl-sheet__content">
     </div>
   </div>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.css" integrity="sha384-wITovz90syo1dJWVh32uuETPVEtGigN07tkttEqPv+uR2SE/mbQcG7ATL28aI9H0" crossorigin="anonymous">
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/katex.min.js" integrity="sha384-/y1Nn9+QQAipbNQWU65krzJralCnuOasHncUFXGkdwntGeSvQicrYkiUBwsgUqc1" crossorigin="anonymous"></script>
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.7.1/contrib/auto-render.min.js" integrity="sha384-dq1/gEHSxPZQ7DdrM82ID4YVol9BYyU7GbWlIwnwyPzotpoc57wDw/guX8EaYGPx" crossorigin="anonymous"></script>
+  <script defer type="text/javascript">
+    function defer(method) {
+      if (window.jQuery && katex) {
+          method();
+      } else {
+          setTimeout(function() { defer(method) }, 5);
+      }
+    }
+    defer(function() {
+      $("script[type='math/tex']").replaceWith(function() {
+        var tex = $(this).text();
+        return katex.renderToString(tex, {displayMode: false});
+      });
+
+      $("script[type='math/tex; mode=display']").replaceWith(function() {
+          var tex = $(this).html();
+          return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+      });
+
+      $(function() {
+        $('.postcontent').anchorific();
+
+        var $sheet = $('.mdl-sheet');
+        if ($sheet.length > 0) {
+          $('html').on('click', function() {
+            $sheet.removeClass('mdl-sheet--opened')
+          });
+
+          $sheet.on('click', function(event) {
+            event.stopPropagation();
+
+            $sheet.addClass('mdl-sheet--opened');
+          });
+        }
+
+        var headers = $(":header");
+        var toc = '<ul class="mdl-list">';
+        headers.each(function(i, elem) {
+          var depth = elem.tagName[1];
+          toc += '\n<li class="mdl-list__item">\n'
+          toc += elem.innerHTML.replace('>', 'style="margin-left: ' + (10*depth) + 'px;">');
+          toc += '\n</li>';
+        })
+        toc += "</ul>";
+        $("#toc").html(toc);
+
+      });
+    });
+  </script>
