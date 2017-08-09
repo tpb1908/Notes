@@ -1689,3 +1689,305 @@ function after a $, and replacing each pair of parenthses with a `.`.
 
 `replicate 100 (product (map (*3) (zipWith max [1,2,3,4,5] [4,5,6,7,8])))` can be rewritten as
 `replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]`.
+
+The free point style allows functions to be written more cleanly
+
+```haskell
+fn x = ceiling (negate (tan (cos (max 50 x))))
+```
+
+can instead be written
+
+```haskell
+fn = ceiling . negate . tan . cos . max 50
+```
+
+## Modules
+
+A Haskell module is a colleciton of related functions, types, and typeclasses.
+A program is a collection of modules in which the main module loads up the other modules and
+then uses their functions to perform some process.
+
+Modules provide many advantages.
+If a module is generic enough, the functions it exports can be used in many different programs.
+If code is searated into self-contained modules which aren't too reliant on each other, they
+can be reused later on and changed more easily without having to rewrite other code.
+
+The standard library is split into mldules, each of which contains related functions and types.
+
+Modules are imported before the definition of any function with the syntax `import module_name`.
+
+The `Data.List` module has useful functions for working with lists.
+
+One of thest functions is `numUniques`
+
+```haskell
+numUniques:: (Eq a) => [a] -> Int
+numUniques = length . nub
+```
+
+When `Data.List` is imported, all of its exports become available in the global namespace.
+`nub` is another function in `Data.List` that removes duplicate elements from a list.
+
+In the terminal, functions can be added to the global namespace with `:m`
+
+```haskell
+> :m + Data.List Data.Map Data.Set
+```
+
+Individual functions can also be imported
+
+```haskell
+import Data.List (nub, sort)
+```
+
+We can also import all of the functions in a module except some which are explicitly excluded.
+This is useful if different modules export functions with the same name.
+
+```haskell
+import Data.List hiding (nub)
+```
+
+Another method for dealing with name clashes is qualified imports.
+The `Data.Map` module contains functions with the same names as some of those in `Prelude`,
+such as `filter` or `null`
+
+```haskell
+import qualified Data.Map
+```
+
+This means that when we wish to reference the `filter` function in `Data.Map` we must write
+`Data.Map.Filter`.
+As this can make code very verbose, there is the option to name the import
+
+```haskell
+import qualified Data.Map as M
+```
+
+We can now access `Data.Map.Filter` as `M.filter`
+
+### `Data.List`
+
+**intersperse** takes an element and a list and puts that element in between each pair of elements in the list
+
+```haskell
+> intersperse 0 [1,2,3,4,5]
+> [1,0,2,0,3,0,4,0,5]
+```
+
+**intercalate** takes a list of lists and a list, and inserts the list between each of the lists within the list of lists, before
+flattening the result
+
+```haskell
+> intercalate [0,0,0] [[1,2,3],[4,5,6],[7,8,9]]
+> [1,2,3,0,0,0,4,5,6,0,0,0,7,8,9]
+```
+
+**transpose** transposes a list of lists. Considering the list of lists as a 2d matrix, rows become columns and vice versa
+
+```haskell
+> transpose [[1,2,3],[4,5,6],[7,8,9]]
+> [[1,4,7],[2,5,8],[3,6,9]]
+```
+
+**fold'** and **foldl1'** are stricter version of their respective lazy incarnations.
+When using lazy folds on very large lists, stack overflow errors may occur.
+Due to the lazy nature of folds, the accumulator is not actually updated as the folding happens.
+The strict fold functions actually compute the intermediate values rather than filling up the stack with thunks.
+
+**concat** flattens a list of lists into a list of elements
+
+```haskell
+> concat [[1,2,3],[4,5,6],[7,8,9]]
+> [1,2,3,4,5,6,7,8,9]
+```
+
+**concatMap** is the same as first mapping a function to al ist, and then concatenating the list with `concat`
+
+**and** takes a list of values and returns `True` only if all the values in the list are `True`
+
+**or** takes a list and returns `True` if any of the values in the list are `True`
+
+```haskell
+> and $ map (>4) [5,6,7,8]
+> True
+> or $ map (==4) [1,2,3,4,5,6,7,8]
+> True
+```
+
+**any** and **all** take a predicate and then check if any or all of the elements in the list satisfy the predicate, respectively.
+These functions are usually used rather than mapping over a list and then using **or** or **and**
+
+**iterate** takes a function and a starting value. It applies the function to the starting value, then applies that function to the result, and repeats, returning
+in the form of an infinite list
+
+```haskell
+> take 10 $ iterate (*2) 1
+> [1,2,4,8,15,32,64,128,256,512]
+```
+
+**splitAt** takes a number and a list. It then splits the list at that many elements, returning the two lists in a tuple
+
+```haskell
+> splitAt 3 [1,2,3,4,5,6]
+> ([1,2,3], [4,5,6])
+```
+
+**takeWhile** takes elements from a list while the predicate holds
+
+```haskell
+> takeWhile (/=' ') "This is a sentence"
+> "This"
+```
+
+**dropWhile** takes a list and drops all the elements from the list while the predicate holds
+
+```haskell
+> dropWhile (<3) [1,2,2,2,2,2,2,8,6,8]
+> [8,6,8]
+```
+
+**span** returns a pair of lists, the first list containing the result of `takeWhile` on the list, and the second list containing the remaining elements
+
+**break** `break p` is the equivelant of `span (not . p)`
+
+**sort** sorts a list of the `Ord` typeclass
+
+**group** takes a list and groups the adjacent elements into sublists if they are equal
+
+```haskell
+> group [1,1,1,2,2,2,2,3,3,3,3,3,4,4,4,4,4,4]
+> [[1,1,1],[2,2,2,2],[3,3,3,3,3],[4,4,4,4,4,4]]
+```
+
+**inits** and **tails** are like  **init** and **tail** except that they recursively apply to the list until there is nothing left
+
+```haskell
+> inits "text"
+> ["", "t", "te", "tex", "text"]
+```
+
+**isInfixOf** returns true if a sublist is contained within a list
+
+**isPrefixOf** and **isSuffixOf** search for a sublist at the beginning and end of a list respectively
+
+**elem** and **notElem** check if an element is or is not inside a list
+
+**partition** takes a list and a predicate and returns a pair of lists, the first containing all the elements that satisfy the predicate, and the second containing those that do not
+
+**find** takes a list and a predicate and returns the first element that satisfies the predicate
+
+The type of `find` is `Maybe a` as it can contain `Just a` or `Nothing`.
+
+**elemIndex** returns the index of an element in a list, or `Nothing` if the element is not contained within the list
+
+**elemIndices** returns a list of the indices of an element within a list
+
+**findIndex** maybe returns the index of the first element that satisfies the predicate
+
+**zip3**, **zip4**, **zipWith3**, and **zipWith4** zip 3 or 4 lists into triples or 4 tuples
+
+**lines** takes a string returns every line of that string in a separate list
+
+```haskell
+> lines "line 1\nline 2\nline 3"
+> ["line 1", "line 2", "line 3"]
+```
+
+**unlines** takes a list of strings and joins them together with the '\\n' character
+
+**words** and **unwords** split a line of text into words or join a list of words respectively
+
+**delete** takes an element and a list and deletes the first occurence of that element in the list
+
+**\\** the list differnece function. For every element in the right hand list, it removes a matching element in the left one
+
+**union** returns the union of two lists
+
+**intersect** returns only the elements that are found in both lists
+
+**insert** takes an element and a list of elements that can be sorted and inserts it into the lsat position where it is less than or equal to the next element
+
+**length**, **take**, **drop** **splitAt**, **!!**, and **replicte** all take **Int** as one of their parameters, or return an **Int**.
+They could be more generic if they took any type that's part of **Integral** or **Num**.
+`Data.List` contains **genericLength**, **genericTake** etc to provide these functions without breaking old code.
+
+The **nub**, **delete**, **union**, **intersect**, and **group** functions all have their more general counterparts **nubBy** etc.
+While the standard functions use `==` to test for equality, the `By` functions take an equality function as a parameter.
+
+Similarly there are `sortBy`, `insertBy`, `maximumBy`, and `minimumBy` functions.
+
+### `Data.Char`
+
+The `Data.Char` module deals with characters
+
+**isControl** checks whether a character is a control character
+
+**isSpace** checks whether a character is a white space character
+
+**isLower** checks whether a characer is lower cased
+
+**isUpper** checks whether a character is upper cased
+
+**isAlpha** checks whether a character is a letter
+
+**isAlphaNum** checks whether a character is a letter or a number
+
+**isPrint** checks whether a character is printable
+
+**isDigit** checks whether a character is a digit
+
+**isOctDigit** checks whether a character is an octal digit
+
+**isHexDigit** checks whether a character is a hexadecimal digit
+
+**isLetter** checks whether a character is a letter
+
+**isMark** checks for Unicode mark characters. These characters combine with preceding letters to form letters with accents
+
+**isNumber** checks whether a character is numeric
+
+**isPunctuation** checks whether a character is punctuation
+
+**isSymbol** checks whether a character is a symbol
+
+**isSeparator** checks for Unicode spaces and separators
+
+**isAscii** checks whether a character falls within the first 128 of the Unicode set
+
+**isLatin1** checks whether a character falls into the first 256 characters of the Unicode set
+
+**isAsciiUpper** checks whether a character is ASCII and uppercase
+
+**isAsciiLower** checks whether a character is ASCII and lowercase
+
+All of the above functions have a type signature of `Char -> Bool`
+
+`Data.Char` exports a data type which is similar to `Ordering`. The `Ordering` type can have a value of `LT`, `EQ`, or `GT`.
+It describes possible result that can arise from comparing elements.
+The `GeneralCategory` type is also an enumeration. It presents possible categories that a character can fall into.
+
+`generalCategory` has a type of `Char -> GeneralCategory`. There are a total of 31 categories.
+
+```haskell
+> generalCategory ' '
+> Space
+> generalCategory 'A'
+> UppercaseLetter
+> generalCategory '|'
+> MathSymbol
+```
+
+**toUpper** converts a character to uppercase, ignoring those which do not have an uppercase
+
+**toLower** converts a character to lowercase
+
+**toTitle** converts a character to title case, which is usually the same as uppercase
+
+**digitToInt** converts a character to an `Int`. The character must be in the range '0..9, a..f, A..F'
+
+**intToDigit** is the inverse of `digitToInt`
+
+**ord** and **chr** convert characters to their numeric values and vice versa
+
+### `Data.Map`
