@@ -1477,7 +1477,7 @@ chain n
 
 Lambdas are anonymous functions that are used because we need some functions only once, and do not want
 to pollute the namespace.
-We write a lambda with a \\ and then write the parameters, followed by a `->` and then the function body.
+We write a lambda with a \newline and then write the parameters, followed by a `->` and then the function body.
 
 Filtering for long chains we might write
 
@@ -1496,7 +1496,7 @@ Lambdas can take any number of parameters in the same way as normal functions
 As with normal functions, we can pattern match in lambdas.
 
 ```haskell
-> map (\\(a,b) -> a + b) [(1,2),(3,5),(6,3),(2,6),(2,5)]
+> map (\newline(a,b) -> a + b) [(1,2),(3,5),(6,3),(2,6),(2,5)]
 > [3,8,9,8,7]
 ```
 

@@ -185,7 +185,7 @@ Disadvantages:
      If any value is less than 5, merge the rows or columns
 3. Calculate the text $$\chi^2$$ statistic
 4. Find the critical value for $$\nu = (n-1)(m-1)$$ degrees of freedom.
-    This can either be done from the table or with $$\text{CHISQUARE_ICDF}(\nu, 1-\alpha)$$
+    This can either be done from the table or with $$\text{CHISQUARE ICDF}(\nu, 1-\alpha)$$
 5. If text $$\chi^2_t > \chi^2_c$$, reject $$H_0$$ in context
 
 ### Yates' correction
@@ -209,7 +209,7 @@ The sign test checks for a difference in the median value by comparing each pair
 
 1. State hypotheses
     i. $$H_0$$ that **population** medians are equal $$\eta_1 = \eta_2$$
-    ii. $$H_1$$: that **population** medians are not equal $$\eta_1 \neq \eta_2$$ or $$\eta_1 (> \text{or} <) \eta_2$$
+    ii. $$H_1$$: that **population** medians are not equal $$\eta_1 \neq \eta_2$$ or $$\eta_1 ( >  < ) \eta_2$$
 2. Find the differences between each pair, ignoring any equal values
 3. Count $$T^+$$ the number of positive differences and $$T^-$$ the number of negative differences
 4. Find the value of $$P\left(X < min(T^+, T^-)\ \|\ X\sim B(n, \frac 1 2)\right)$$
@@ -225,7 +225,7 @@ The Wilcoxon test is similar to the sign test except that it ranks the differenc
     ii. $$H_1$$ **Population** average difference not 0
 2. Rank the absolutes of the differences, giving each rank the sign of its respective difference
 3. Calculate $$T^+$$ and $$T^-$$, the sums of the positive and negative ranks respectively. Let $$T_t = \text{min}(T^+, T^-)$$
-4. Find the critical value, $T_c$ from the table
+4. Find the critical value, $$T_c$$ from the table
 5. Compare $$T_t$$ to $$T_c$$, rejecting $$H_0$$ if $$T_t$$ is smaller
 
 ### Mann-Whitney U-test
