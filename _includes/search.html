@@ -1,8 +1,6 @@
 
 <div class="search">
-  <link rel="stylesheet" href="{{ "/assets/tipuesearch/css/normalize.css" | relative_url }}">
   <script src="{{ "/assets/tipuesearch/tipuesearch_content.js" | relative_url }}"></script>
-  <link rel="stylesheet" href="{{ "/assets/tipuesearch/css/tipuesearch.css" | relative_url }}">
   <script src="{{ "/assets/tipuesearch/tipuesearch_set.js" | relative_url }}"></script>
   <script src="{{ "/assets/tipuesearch/tipuesearch.min.js" | relative_url }}"></script>
   <form action="{{ page.url | relative_url }}" id="search_form">
@@ -13,12 +11,12 @@
 
   <div id="tipue_search_content"></div>
 
-  <script>
+<script>
   $(document).ready(function() {
     $('#tipue_search_input').tipuesearch({
       'wholeWords' : false,
       'showURL' : false,
-    
+
     });
   });
   </script>

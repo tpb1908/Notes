@@ -1474,3 +1474,218 @@ chain n
 ```
 
 ### Lambdas
+
+Lambdas are anonymous functions that are used because we need some functions only once, and do not want
+to pollute the namespace.
+We write a lambda with a \\ and then write the parameters, followed by a `->` and then the function body.
+
+Filtering for long chains we might write
+
+```haskell
+numLongChains :: Int
+numLongChains = length (filter (\xs -> length xs > 15) (map chain [1..100]))
+```
+
+Lambdas can take any number of parameters in the same way as normal functions
+
+```haskell
+> zipWith (\a b -> (a * 30 + 3) / b) [5,4,3,2,1] [1,2,3,4,5]
+> [153.0, 61.5, 31.0, 15.75, 6.6]
+```
+
+As with normal functions, we can pattern match in lambdas.
+
+```haskell
+> map (\\(a,b) -> a + b) [(1,2),(3,5),(6,3),(2,6),(2,5)]
+> [3,8,9,8,7]
+```
+
+Due to the way we curry functions, the following two are equivelant
+
+```haskell
+addThree :: (Num a) => a -> a -> a -> a
+addThree x y z = x + y + z
+```
+
+```haskell
+addThree :: (Num a) => a -> a -> a -> a
+addThree = \x -> \y -> \z -> x + y + z
+```
+
+While the example above decreases readability, it can aid with the understanding of some functions, such as `flip`
+
+```
+flip' :: (a -> b -> c) -> b -> a -> c
+flip' f = \x y -> f y x
+```
+
+### Folding
+
+**foldl** The left fold the folds a list up form the left side
+
+```haskell
+sum' :: (Num a) => [a] -> a
+sum' xs = foldl (\acc x -> acc + x) 0 xs
+```
+
+In the example above `\acc x -> acc + x` is the binary function. `0` is the starting value and `xs` is the list to be
+folded up.
+
+```haskell
+> sum' [3,5,2,1]
+> 11
+```
+At each step we have
+| `0 + 3` | `[3,5,2,1]` |
+| `3 + 5` | `[5,2,1]` |
+| `8 + 2` | `[2,1]` |
+| `10 + 1`| `[1]` |
+| `11` | |
+
+We could implement `elem` using `foldl`
+
+```haskell
+elem' :: (Eq a) => a -> [a] -> Bool
+elem' y ys = foldl (\acc x -> if x == y then True else acc) False ys
+```
+
+The starting value and accumulator above are both boolean values.
+
+**foldr** Works in a similar way to **foldl**, except that it consumes values from the right
+`foldr` takes the accumulator as the second function.
+
+We can implement `map` with a `foldr`.
+
+```haskell
+map' :: (a -> b) -> [a] -> [b]
+map' f xs = foldr (\x acc -> f x : acc) [] xs
+```
+
+If we map `(+3)` to `[1,2,3]`, we approach the list from the right side.
+We take the first element `3` and apply the function to it, giving `6`.
+We prepend `6` to the accumulator.
+We then apply `(+3)` to `2`, giving `5`, and prepend it to the accumulator.
+Continuing in the same manner we reach `[4,5,6]`.
+
+One notable difference is that `folr` works on infinite lists, while `foldl` does not.
+
+Folds can be used to implement any function were you traverse a list once.
+
+There are also the functions `foldl1` and `foldr1` which do not require a starting value, instead
+assuming that the first value in their traversal order is the starting value.
+
+This would allow an implementation of sum as `sum = foldl1 (+)`, althought it would cause an error
+on an empty list.
+
+#### Fold implementations of standard library functions
+
+```haskell
+maximum' :: (Ord a) => [a] -> a
+maximum' = foldr1 (\x acc -> if x > acc then x else acc)
+
+reverse' :: [a] -> [a]
+reverse' = foldl (\acc x -> x : acc) []
+
+product' :: (Num a) => [a] -> a
+product' = foldr1 (*)
+
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' p = foldr (\x acc -> if p x then x : acc else acc) []
+
+head' :: [a] -> a
+head' = foldr1 (\x _ -> x)
+
+last' :: [a] -> a
+last' = foldl1 (\_ x -> x)
+```
+
+The `head` function would be better implemented by pattern matching, as the `fold` traverses the entire list.
+
+In `reverse` we take a starting value of an empty list and append each value from the left to our list.
+
+
+### `scanl` and `scanr`
+
+`scanl` and `scanr` are like `foldl` and `foldr`, with the difference being that they report all
+the intermediate accumulator states in the form of a list.
+There are also `scanl1` and `scanr1`
+
+
+```haskell
+> scanl (+) 0 [3,5,2,1]
+> [0,3,8,10,11]
+> scanr (+) 0 [3,5,2,1]
+> [11,8,3,1,0]
+> scanl1 (\acc x -> if x > acc then x else acc) [3,4,5,3,,7,9,2,1]
+> [3,4,5,5,7,9,9,9]
+> scanl (flip (:)) [] [3,2,1]
+> [[],[3],[2,3],[1,2,3]]
+```
+
+Scans are used to monitor the progression of a function that can be implemented as a fold.
+
+### Function application with $
+
+The `$` function is also called function application.
+
+```haskell
+($) :: (a -> b) -> a -> b
+f $ x = f x
+```
+
+Whereas normal function application has the highest precednce, `$` has the lowest precedence.
+
+Function application with a space is left-associative so `f a b c` is the same as `((f a) b) c`.
+Function application with `$` is right associative.
+
+Consider the expression `sum (map sqrt [1..130])`.
+We can instead write `sum $ map sqrt [1..130]`.
+When a `$` is encountered the expression on its right is applied as the parameter to the function on its left.
+
+Consider `sqrt (3 + 4 + 9)`. We could instead write this as `sqrt $ 3 + 4 + 9`.
+
+In `sum (filter (> 10) (map (*2) [2..10]))` we can write `sum $ filter (> 10) $ map (*2) [2..10]` because
+`f (g (z x))` is equal to `f $ g $ z x`.
+
+### Function composition
+
+In Haskell, function composition is performed with the `.` function, which is defined as follows
+
+```haskell
+(.) :: (b -> c) -> (a -> b) -> a -> c
+f . g = \x -> f (g x)
+```
+
+`f` must take as its parameter a value that has the same tpe as `g`'s return value.
+
+One of the uses for function composition is making functions on the fly to pass to other functions,
+which is often cleaner and more concise than lambdas.
+
+```haskell
+> map (\x -> negate (abs x)) [5,-3,-6,7,-3,2,-19,24]
+> [-5,-3,-6,-7,-3,-2,-19,-24]
+> map (negate . abs) [5,-3,-6,7,-3,2,-19,24]
+> [-5,-3,-6,-7,-3,-2,-19,-24]
+```
+
+Function composition is right associative, so multiple functions can be composed together.
+
+#### Function composition with multiple parameters
+
+If we want to use a function with multiple parameters in a function composition, we usually have
+to partially apply them so that each function takes just one parameter.
+
+`sum (replicate 5 (max 6.7 8.9))` can be rewritten as `(sum . replicate 5. max 6.7) 8.9` or as
+`sum . replicate 5 . max 6.7 $ 8.9`.
+
+What is ahappening is the creation of a function that takes what `max 6.7` takes and applies `replicate 5`
+to it. Then a function that takes the result of that and does a sum of it is create.
+Finally, that unction is called with `8.9`.
+However it is more easily read as taking the value of `max 6.7 8.9`, replicating it `5` times, and taking the
+sum of that replication.
+
+If you want to rewrite a function with lots of parentheses you can start by putting the last parameter of the innermost
+function after a $, and replacing each pair of parenthses with a `.`.
+
+`replicate 100 (product (map (*3) (zipWith max [1,2,3,4,5] [4,5,6,7,8])))` can be rewritten as
+`replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]`.

@@ -1,8 +1,4 @@
----
----
 @charset "utf-8";
-
-
 
 body {
   background-color: #303030;
@@ -149,11 +145,16 @@ table, th, td {
   font-size: 85%;
   background-color: rgba(27,31,35,0.05);
   border-radius: 3px;
+
 }
 
 .highlight code {
   background-color: rgba(0,0,0,0);
   font: 14px "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace
+}
+
+.highlighter-rouge {
+    margin-bottom: 1em;
 }
 
 .titlebox {

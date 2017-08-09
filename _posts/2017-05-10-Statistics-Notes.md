@@ -149,21 +149,21 @@ Disadvantages:
 
 | Test | Details | Case to reject $$H_0$$ |
 | --- | --- | --- |
-| **SS02** |
+| **SS02** | | |
 | Z/T test | Determines whether two population means are different | TV > CV |
 | **SS03** |  |  |
 | Contingency tables | A test for independence | CV > TV |
 | Sign test | Test for difference in medians | TV < CV |
 | Wilcoxon | Test for difference in mean or median | TV < CV |
 | Mann-Whitney | Test for equality of population | TV < CV |
-| Kruskal-Wallis | Test for equality of population of two or more samples| TV > CV
+| Kruskal-Wallis | Test for equality of population of two or more samples| TV > CV |
 | Correlation coefficient | Test for existence of correlation between two random variables | TV > SL |
 | **SS04** | | |
 | Poisson | Test for change in a Poisson variable| TV < SL |
 | Proportion | Test whether sample proportion represents the population | TV < SL |
 | **SS05** | | |
 | Variance | Tests a sample for a given population variance | TV > CV(Upper) or TV < CV(Lower) |
-| Variance equality of samples (F) | Test for equality of the variances of the populations of two samples of two normally distributed random variables |TV > CV |
+| Variance equality of samples (F) | Test for equality of the variances of the populations of two samples of two normally distributed random variables | TV > CV |
 | Difference in mean (Two sample Z) | Test for the difference in the means of two independent populations | \|TV\| > \|CV\| |
 | Difference in mean (Two sample T) | Test for the difference in the means of two independent populations with unknown variances | \|TV\| > \|CV\| |
 | Goodness of fit | Test for the fit of a sample to a particular distributio n| TV > CV | |

@@ -1,10 +1,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{ page.title }}</title>
 <link href="{{ "/assets/images/icon.png" | relative_url}}" rel="icon" type="image/x-icon" />
-<link href="https://fonts.googleapis.com/css?family=Lobster|Roboto|Material+Icons" rel="stylesheet">
-<link href="{{ "/css/main.css" | relative_url }}" rel="stylesheet">
-<link href="{{ "/css/highlight.css" | relative_url }}" rel="stylesheet">
-<link href="{{ "/css/material.min.css" | relative_url }}" rel="stylesheet">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script type="text/javascript" src="{{ "assets/anchorific/anchorific.min.js" | relative_url }}">
+<link href="https://fonts.googleapis.com/css?family=Lobster|Roboto|Material+Icons" rel="stylesheet" lazyload>
+
+<style type="text/css">
+   {% capture include_to_scssify %}
+     {% include style.scss %}
+   {% endcapture %}
+   {{ include_to_scssify | scssify }}
+ </style>
+<script async src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script async type="text/javascript" src="{{ "assets/anchorific/anchorific.min.js" | relative_url }}">
 </script>

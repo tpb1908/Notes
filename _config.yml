@@ -18,6 +18,8 @@ tipue_search:
     files: [head.html]
     categories: [layouts]
 
+sass:
+  sadd_dir: ./_sass
 
 theme: minima
 
