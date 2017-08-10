@@ -1991,3 +1991,194 @@ The `GeneralCategory` type is also an enumeration. It presents possible categori
 **ord** and **chr** convert characters to their numeric values and vice versa
 
 ### `Data.Map`
+
+Association lists are lists that are used to store key-value pairs where ordering does not matter.
+
+We could represent this structure with a list of pairs, and find values by their key as follows
+
+```haskell
+findKey :: (Eq k) => k -> [(k, v)] -> v
+findKey key xs = snd . head . filter (\(k,v) -> key == k) $ xs
+```
+
+The function takes the list of pairs, filters the list so that only matching keys remain, and takes the head value.
+
+In order to deal with elements which do not exist, we must return `Maybe v`
+
+```haskell
+findKey :: (Eq k) => k -> [(k,v)] -> Maybe v
+findKey key [] = Nothing
+findKey key ((k,v):xs) = if key == k
+                           then Just v
+                           else findKey key xs
+```
+
+This recursive function on a list can be implemented as a fold
+
+```haskell
+findKey :: (Eq k) => k -> [(k,v)] -> Maybe v
+findKey key = foldr (\(k,v) acc -> if key == k then Just v else acc) Nothing
+```
+
+The `findKey` function does the same thing as the `lookup` function from `Data.List`.
+The `Data.Map` module offers association lists which are much faster, as they are not traversing lists.
+
+`Data.Map` should qualified in order to stop namespace clashes with `Prelude` and `Data.List`.
+
+**fromList** takes an association list and returns a map with the same associations
+
+If there are duplicate keys in the list, they are discarded.
+`fromList` has the signature `Map.fromList :: (Ord k) => [(k, v)] -> Map.Map k v`.
+
+The keys must be orderable so that they can be placed in a tree.
+
+**empty** represents an empty map
+
+**insert** takes a key, a value, and a map, and returns a new map with the new item
+
+```haskell
+> Map.empty
+> fromList []
+> Map.insert 3 100 Map.empty
+> fromList [(3,100)]
+```
+
+**null** checks if a map is empty
+
+**size** reports the size of a map, which is the number of key value pairs
+
+**singleton** takes a key and a value and creates a map with exactly one mapping
+
+**lookup** returns `Just something` if a key exists and `Nothing` if it does not
+
+**member** is a predicate that takes a key and a map and reports whether the key is in the map
+
+**map** and **filter** work much like their list equivalents, working on the values
+
+**toList** is the inverse of `fromList`
+
+**keys** and **elems** return a list of keys and values respectively
+
+**fromListWith** acts like `fromList` except that it takes a function supplied to decide what to do with duplicate keys
+
+The function is used to combine the values of those keys into some other value
+
+**insertWIth** inserts a key-value pair into a map, using the passed function if the key already exists
+
+### `Data.Set`
+
+`Data.Set` offers set structures.
+
+**fromList** takes a list and converts it to a set
+
+```haskell
+> Set.fromList "The quick brown fox jumped over the lazy dog."
+> fromList " .Tabcdefghijklmnopqrstuvwxyz"
+```
+
+The elements are ordered and each element is unique
+
+**intersection** returns a set of the elements which are present in both sets
+
+**difference** returns a set of the elements which are in the first set but not the second
+
+**union** returns a set of the combined elements of both sets
+
+**null**, **size**, **member**, **empty**, **singleton**, **insert**, and **delete** work as expected
+
+**isSubsetOf** checks if the first set is a subset of the second set
+
+**isProperSubsetOf** checks if the first set is a proper subset of the second set
+
+### Creating modules
+
+Modules are defined as follows
+
+```haskell
+module Geometry  
+( sphereVolume  
+, sphereArea  
+, cubeVolume  
+, cubeArea  
+, cuboidArea  
+, cuboidVolume  
+) where  
+
+sphereVolume :: Float -> Float  
+sphereVolume radius = (4.0 / 3.0) * pi * (radius ^ 3)  
+
+sphereArea :: Float -> Float  
+sphereArea radius = 4 * pi * (radius ^ 2)  
+
+cubeVolume :: Float -> Float  
+cubeVolume side = cuboidVolume side side side  
+
+cubeArea :: Float -> Float  
+cubeArea side = cuboidArea side side side  
+
+cuboidVolume :: Float -> Float -> Float -> Float  
+cuboidVolume a b c = rectangleArea a b * c  
+
+cuboidArea :: Float -> Float -> Float -> Float  
+cuboidArea a b c = rectangleArea a b * 2 + rectangleArea a c * 2 + rectangleArea c b * 2  
+
+rectangleArea :: Float -> Float -> Float  
+rectangleArea a b = a * b  
+```
+
+The helper function `rectangleArea` is not exported.
+
+Modules can be given hierarchical structures.
+Each module can have a number of submodules which can have submodules of their own.
+
+#### Creating submodules
+
+First we create a folder called `Geometry`.
+Within this folder we create three files: `Sphere.hs`, `Cuboid.hs`, and `Cube.hs`
+
+```haskell
+module Geometry.Sphere  
+( volume  
+, area  
+) where  
+
+volume :: Float -> Float  
+volume radius = (4.0 / 3.0) * pi * (radius ^ 3)  
+
+area :: Float -> Float  
+area radius = 4 * pi * (radius ^ 2)  
+```
+
+```haskell
+module Geometry.Cuboid  
+( volume  
+, area  
+) where  
+
+volume :: Float -> Float -> Float -> Float  
+volume a b c = rectangleArea a b * c  
+
+area :: Float -> Float -> Float -> Float  
+area a b c = rectangleArea a b * 2 + rectangleArea a c * 2 + rectangleArea c b * 2  
+
+rectangleArea :: Float -> Float -> Float  
+rectangleArea a b = a * b  
+```
+
+```haskell
+module Geometry.Cube  
+( volume  
+, area  
+) where  
+
+import qualified Geometry.Cuboid as Cuboid  
+
+volume :: Float -> Float  
+volume side = Cuboid.volume side side side  
+
+area :: Float -> Float  
+area side = Cuboid.area side side side
+```
+
+In each module we have defined functions with the same names.
+This is possible because they are separate modules.
