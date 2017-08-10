@@ -2182,3 +2182,296 @@ area side = Cuboid.area side side side
 
 In each module we have defined functions with the same names.
 This is possible because they are separate modules.
+
+## Making Types and Typeclassses
+
+### Algebraic data types
+
+```haskell
+data Bool = False | True
+```
+
+The `data` keyword is used to define a new data type.
+The part before the `=` denotes the type, and the parts after it are `value constructors`.
+They specify the different values that this type can have.
+
+We could think of `Int` as being
+
+```haskell
+data Int = -2147483648 | -2147483647 | ... | -1 | 0 | 1 | 2 | ... | 2147483647
+```
+
+Consider the definition of a shape
+
+```haskell
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float
+```
+
+The `Circle` value constructor has three fields.
+When we write a value constructor we optionally add some types after it and those types define the values it will contain.
+
+Value constructors are actually functions that ultimately return a value of a data type.
+
+```haskell
+> :t Circle
+> Circle :: Float -> Float -> Float -> Shape
+> :t Rectangle
+> Rectangle :: Float -> Float -> Float -> Float -> Shape
+```
+
+
+A function to find the surface of a `Shape` cane be written as follows
+
+```haskell
+surface :: Shape -> Float
+surface (Circle _ _ r) = pi * r ^ 2
+surface (Rectangle x1 y1 x2 y2) = (abs $ x2 - x1) * (abs $ y2 - y1)
+```
+
+We could not write a type declaration of `Circle -> Float` because `Circle` is not a type, whereas `Shape` is.
+We can pattern match against constructors, which we have been doing before when matching against values like `[]` or `False`.
+
+To make our type printable we modify it as below
+
+```haskell
+data Shape = Circle Float Float Float | Rectangle Float Float Float Float deriving (Show)
+```
+
+When we add `deriving (Show)` at the end of a `data` declaration, Haskell makes that type part of the `Show` typeclass automatically.
+
+Value constructors are functions, so we can map them and partially apply them.
+
+```haskell
+> map (Circle 10 20) [4,5,6,7]
+> [Circle 10.0 20.0 4.0,Circle 10.0 20.0 5.0,Circle 10.0 20.0 6.0,Circle 10.0 20.0 7.0]  
+```
+
+To improve the `Shape` type we can define an intermediate data type to represent a point in two dimensional space
+
+```haskell
+data Point = Point Float Float deriving (Show)  
+data Shape = Circle Point Float | Rectangle Point Point deriving (Show)  
+```
+
+When defining a point, we used the name for the data type and its value constructor. This has no special meaning.
+
+The `surface` function must now be adjusted
+
+```haskell
+surface :: Shape -> Float
+surface (Circle r) = pi * r ^ 2
+surface (Rectangle (Point x1 y1) (Point x2 y2)) = (abs $ x2 - x1) * (abs $ y2 - y1)
+```
+
+When calculating the area of the rectangle we use nested pattern matching to access the fields.
+
+We can defined a function to modify the position of a shape
+
+```haskell
+nudge :: Shape -> Float -> Float -> Shape
+nudge (Circle (Point x y) r) a b = Circle (Point (x+a) (y+b)) r
+nudge (Rectangle (Point x1 y1) (Point x2 y2)) a b = Rectangle (Point (x1+a) (y1+b)) (Point (x2+a) (y2+a))
+```
+
+```haskell
+> nudge (Circle (Point 34 34) 10) 5 10
+> Circle (Point 39.0 44.0) 10.0
+```
+
+If we don't want to deal directly with points, we can make auxiliary functions that create shapes of some size at the zero coordinates and then nudge those.
+
+```haskell
+baseCircle :: Float -> Shape
+baseCircle r = Circle (Point 0 0) r
+
+baseRect :: Float -> Float -> Shape
+baseRect width height = Rectangle (Point 0 0) (Point width height)
+```
+
+```haskell
+> nudge (baseRect 40 100) 60 23
+> Rectangle (Point 60.0 23.0) (Point 100.0 123.0)
+```
+
+These data types can be exported in modules.
+Write the type along with the functions to be exported, and then add parentheses and specify the value constructors to be exported for it.
+To export all the value constructors for a type, just write `..`
+
+```haskell
+module Shapes   
+( Point(..)  
+, Shape(..)  
+, surface  
+, nudge  
+, baseCircle  
+, baseRect  
+) where  
+```
+
+By writing `Shape(..)` we exported all the value constructors for `Shape`. This is the same as writing `Shape(Rectangle, Circle)`.
+
+We could opt not to export the value constructors for `Shape` by just writing `Shape`.
+This would mean that any user of the module could only make shapes using the auxiliary functions `baseCircle` and `baseRect`.
+
+### Record syntax
+
+Suppose we wish to create a data type to contain information about a person.
+
+```haskell
+data Person = Person String String Int Float String String deriving (Show)  
+```
+
+```haskell
+> let guy = Person "Buddy" "Finklestein" 43 184.2 "526-2928" "Chocolate"  
+> guy  
+Person "Buddy" "Finklestein" 43 184.2 "526-2928" "Chocolate"  
+```
+
+This is somewhat unreadable.
+
+Now suppose that we cant to create a function to get individual pieces of information from a `Person`.
+
+```haskell
+firstName :: Person -> String  
+firstName (Person firstname _ _ _ _ _) = firstname  
+
+lastName :: Person -> String  
+lastName (Person _ lastname _ _ _ _) = lastname  
+
+age :: Person -> Int  
+age (Person _ _ age _ _ _) = age  
+
+height :: Person -> Float  
+height (Person _ _ _ height _ _) = height  
+
+phoneNumber :: Person -> String  
+phoneNumber (Person _ _ _ _ number _) = number  
+
+flavor :: Person -> String  
+flavor (Person _ _ _ _ _ flavor) = flavor  
+```
+
+This is tedious to write.
+
+Instead we can write out data type as follows
+
+```haskell
+data Person = Person { firstName :: String  
+                     , lastName :: String  
+                     , age :: Int  
+                     , height :: Float  
+                     , phoneNumber :: String  
+                     , flavor :: String  
+                     } deriving (Show)   
+```
+
+We define a name for each field, and then specify its type.
+Functions are automatically created for looking up fields. The functions have the same name as the fields.
+
+```haskell
+> :t flavor
+> flavor :: Person -> String
+```
+
+When we derive `Show`, the output is also much more useful.
+
+```haskell
+data Car = Car String String Int deriving (Show)  
+```
+
+```haskell
+> Car "Ford" "Mustang" 1967  
+Car "Ford" "Mustang" 1967  
+```
+
+```haskell
+data Car = Car {company :: String, model :: String, year :: Int} deriving (Show)
+```
+
+```haskell
+> Car {company="Ford", model="Mustang", year=1967}  
+Car {company = "Ford", model = "Mustang", year = 1967}  
+```
+
+When making a new `Car` we don't have to put the fields in their proper order, as long as we list all of them. If we were not using record syntax, we would have to specify them in order.
+
+Record syntax should be used when there are numerous parameters which are not immediately distinguishable.
+
+### Type parameters
+
+A value constructor can take some values as parameters and then produce a new value.
+In a similar manner, type constructors take types as parameters and produce new types.
+
+```haskell
+data Maybe a = Nothing | Just a
+```
+
+The `a` above is the type parameter. Because there is a type parameter involved, we call `Maybe` a type constructor.
+Depending on what we want this data type to hold when it is not `Nothing`, this type constructor can produce a type of `Maybe Int`, `Maybe String` or any other `Maybe` type.
+No value can have a type of just `Maybe`, because that is not a type, only a type constructor.
+
+If we pass `Char` as the type parameter to `Maybe`, we get a type of `Maybe Char`. The value `Just 'a'` has a type of `Maybe Char`.
+
+```haskell
+> Just "String"
+> Just "String"
+> Just 84
+> Just 84
+> :t Just "String"
+> Just "String" :: Maybe [Char]
+> :t Just 84
+> Just 84 :: (Num t) => Maybe t
+> :t Nothing
+> Nothing :: Maybe a
+> Just 10 :: Maybe Double
+> Just 10.0
+```
+
+Type parameters are useful because we can make different types with them depending on what kind of types we want contained in our data type.
+
+The type of `Nothing` is `Maybe a`. It is polymorphic. If some function requires `Maybe Int` as a parameter, we can give it `Nothing`, because `Nothing` doesn't contain a value anyway.
+The `Maybe a` type can act like a `Maybe Int` if it has to.
+Similarly, the type of an empty list is `[a]`, so an empty list can act like anything.
+
+Another parametrized type is `Map k v`.  Having maps parametrized enables us to have mappings from any type to any other type, as long as the type of the key is part of the `Ord` typeclass.
+If we were defining a mapping type, we could add a typeclass constraint in the data declaration.
+
+```haskell
+data (Ord k) => Map v k = ...
+```
+
+It is a very strong convention in Haskell to **never add typeclass constraints in data declarations**.
+This is because we don't benefit a lot, but we end up writing more class constraints, even when we don't need them.
+If we put or don't put the `Ord k` constraint for `Map k v`, we will have to put the constraint into functions that assume the keys in a map can be ordered.
+If we don't put the constraint in the data declaration, we don't have to put `(Ord k) =>` in the type declarations of functions that don't care whether the keys can be ordered.
+
+An example is `toList`, which has a type signature of `toList :: Map k a -> [(k, a)]` rather than having to have a type constraint `toList :: (Ord k) => Map k a -> [(k, a)]` without actually doing any comparing of keys.
+
+We don't put type constraints in data declarations because they will have to be put in function type declarations anyway.
+
+
+A 3d vector type and some operations are defined as follows
+
+```haskell
+data Vector a = Vector a a a deriving (Show)  
+
+vplus :: (Num t) => Vector t -> Vector t -> Vector t  
+(Vector i j k) `vplus` (Vector l m n) = Vector (i+l) (j+m) (k+n)  
+
+vectMult :: (Num t) => Vector t -> t -> Vector t  
+(Vector i j k) `vectMult` m = Vector (i*m) (j*m) (k*m)  
+
+scalarMult :: (Num t) => Vector t -> Vector t -> t  
+(Vector i j k) `scalarMult` (Vector l m n) = i*l + j*m + k*n  
+```
+
+We use a parametrized type because the vector should support several numeric types.
+
+`vplus` is use to add two vectors together. `scalarMult` is for the scalar product of two vectors, and `vectMult` is for multiplying a vector with a scalar.
+These functions can operate on types of `Vector Int`, `Vector Integer`, `Vector Float`, and any other type from the `Num` typeclass.
+
+It is very important to distinguish between the type constructor and the value constructor.
+When declaring a data type, the part before the `=` is the type constructor and the constructors after it are value constructors.
+
+
+### Derived instances
