@@ -30,12 +30,12 @@ An infinite list of natural numbers can be generated as follows
 
 When we want to use these values we can write
 
-{% highlight haskell %}
+```haskell
 > take 10 naturals
 > [1,2,3,4,5,6,7,8,9,10]
-{% endhighlight %}
+```
 
-We could more succintly use the notation for a range
+We could more succinctly use the notation for a range
 
 ```haskell
 > let naturals = [1..]
@@ -144,7 +144,7 @@ The min and max functions both take two parameters
 
 Function application as seen above has the highest precedence
 
-This means that the following statements are equivelant
+This means that the following statements are equivalent
 
 ```haskell
 > succ 9 + max 5 4 + 1
@@ -179,7 +179,7 @@ In Haskell, spaces are used instead.
 doubleValue x = x + x
 ```
 
-The function above consists of a funciton name, followed by parameters separated by spaces. After the `=` the function body is defined.
+The function above consists of a function name, followed by parameters separated by spaces. After the `=` the function body is defined.
 
 This function will work on any numeric type.
 
@@ -248,7 +248,7 @@ As strings are backed by lists of characters, we can apply list functions to the
 
 ### String and list concatenation
 
-Strings are concatenatd with the `++` operator.
+Strings are concatenated with the `++` operator.
 
 ```haskell
 > "hello" ++ " " ++ "world"
@@ -315,7 +315,7 @@ The nested lists can be of different dimensions, but they must be of the same ty
 ### List comparisons
 
 Lists can be compared if there is a method for comparing their contents.
-When using `<, <=, >, >=` to compare lists, their elements are compared in lexographical order. First the head elements are compared, if they are equal the next elements are compared and so forth, until two elements are not equal, or one of the lists ends.
+When using `<, <=, >, >=` to compare lists, their elements are compared in lexicographical order. First the head elements are compared, if they are equal the next elements are compared and so forth, until two elements are not equal, or one of the lists ends.
 
 ```haskell
 > [3,4,2] == [3,4,2]
@@ -498,7 +498,7 @@ The part before the pipe is called the output function, $$x$$ is the variable, $
 
 The set $$S$$ contains the doubles of all the values that satisfy the predicate.
 
-In Haskell we could write `take 10 [2,4,..]` but this wouold produce doubles of the first 10 natural numbers.
+In Haskell we could write `take 10 [2,4,..]` but this would produce doubles of the first 10 natural numbers.
 
 A list comprehension should be used instead.
 
@@ -507,7 +507,7 @@ A list comprehension should be used instead.
 > [2,4,6,8,10,12,14,16,18,20]
 ```
 
-We can also add a preciate to the comprehension
+We can also add a predicate to the comprehension
 
 ```haskell
 > [x*2 | x <- [1..10], x*2 >= 12]
@@ -588,10 +588,10 @@ The comprehension shown above applies a comprehension to each of the lists, with
 ## Tuples
 
 Tuples are similar to lists, providing a way to store several values in a single value.
-Tuples are used when the number of values you want to combine is known, and its type depends on how many components it has along with the type of the componenets.
-They are denoted with parantheses around a comma separated list of values.
+Tuples are used when the number of values you want to combine is known, and its type depends on how many components it has along with the type of the components.
+They are denoted with parentheses around a comma separated list of values.
 
-Unlike lists, tuples do not have to be homogenous, meaning that they can contain several types.
+Unlike lists, tuples do not have to be homogeneous, meaning that they can contain several types.
 
 ```haskell
 > --List of tuples of the same type
@@ -681,7 +681,7 @@ The return type is the last item in the declaration and the parameters are the f
 
 **Float** A real floating point value with single precision
 
-**Double** A real floating point value with double preceision
+**Double** A real floating point value with double precision
 
 **Bool** A boolean type, `True` or `False`
 
@@ -834,7 +834,7 @@ To be part of `Num`, a type must also be part of `Show` and `Eq`.
 
 **Floating** Is a numeric typeclass containing `Float` and `Double`
 
-The `fromIntegral` function has a type decleration of `fromInegral :: (Num b, Integral a) => a -> b`.
+The `fromIntegral` function has a type declaration of `fromInegral :: (Num b, Integral a) => a -> b`.
 It takes an integral number and turns it into a more general number.
 
 ## Syntax in functions
@@ -918,7 +918,7 @@ tell (x:y:_) = "The list is long. The first two elements are " ++ show x ++ " an
 The `tell` function is safe because it handles the empty list, singleton list, two element list, and lists with more than two elements.
 
 We could rewrite `(x:[])` and `(x:y:[])` as `[x]` and `[x,y]` respectively.
-We cannot howver rewrite `(x:y:_)` with square brackets because it matches any list of length 2 or more.
+We cannot however rewrite `(x:y:_)` with square brackets because it matches any list of length 2 or more.
 
 We can implement a recursive length function using list comprehension
 
@@ -951,13 +951,13 @@ capital "" = "Empty string"
 capital all@(x:xs) = "The first letter of " ++ all ++ " is " + [x]
 ```
 
-Patterns can be usd to avoid needless repetition.
+Patterns can be used to avoid needless repetition.
 
 Note that `++` cannot be used in pattern matching.
 
 ### Guards
 
-While patterns make sure a value conforms to some form and allow destrucuting it, guards are a way of testing whether some property or properties
+While patterns make sure a value conforms to some form and allow destructuring it, guards are a way of testing whether some property or properties
 of a value are true or false.
 Guards are much more readable that a statement when there are several conditions.
 
@@ -976,12 +976,12 @@ They are usually indented.
 A guard is basically a boolean expression. If it evaluates to `True`, the corresponding body is used.
 Otherwise, the next guard is evaluated.
 
-The last guard will often be `otherwise`. `otherwise` is simpy an alias for `True`, and catches everything.
+The last guard will often be `otherwise`. `otherwise` is simply an alias for `True`, and catches everything.
 
 If all the guards of a function evaluate to `False` and there is no `otherwise` guard, evaluation falls through
 to the next pattern. If no suitable guards or patterns are found, an error is thrown.
 
-Guards can also be writen inline, althought it is less readable.
+Guards can also be written inline, although it is less readable.
 
 ```haskell
 max' :: (Ord a) => a -> a -> a
@@ -1052,7 +1052,7 @@ calcBmis xs = [bmi w h | (w, h) <- xs]
 ### Let it be
 
 `let` bindings are very similar to `where` bindings.
-`let` bindings allow you to bind variaables anywhere and are themselves expressions.
+`let` bindings allow you to bind variables anywhere and are themselves expressions.
 They do not span across guards.
 
 ```haskell
@@ -1095,7 +1095,7 @@ If we want to bind several variables in line, we can separate them with semicolo
 > (6000000, "Hey there!")
 ```
 
-`let` bindings are very useful for quckly dismantling a tuple into components and binding them to names.
+`let` bindings are very useful for quickly dismantling a tuple into components and binding them to names.
 
 ```haskell
 > (let (a,b,c) = (1,2,3) in a+b+c)*100
@@ -1254,7 +1254,7 @@ elem' a (x:xs)
 
 ### Quick sort
 
-Implementing QuickSort is much easier in Haskell than in imperative langauges.
+Implementing QuickSort is much easier in Haskell than in imperative languages.
 
 ```haskell
 quicksort :: (Ord a) => [a] -> [a]
@@ -1277,7 +1277,7 @@ A function that does either of those is called a higher order function.
 Every function in Haskell only takes one parameter.
 All the functions which take several parameters are curried functions.
 
-The following two calls are equivelant
+The following two calls are equivalent
 
 ```haskell
 > max 4 5
@@ -1346,7 +1346,7 @@ applyTwice :: (a -> a) -> a -> a
 applyTwice f x = f (f x)
 ```
 
-Notice that the type decleration contains parentheses.
+Notice that the type declaration contains parentheses.
 They are mandatory when one of the parameters is a function.
 
 ```haskell
@@ -1384,7 +1384,7 @@ flip' f = g
   where g x y = f y x
 ```
 
-Reading the type decleration we say that `flip'` takes a function that takes an `a` and a `b`, and
+Reading the type declaration we say that `flip'` takes a function that takes an `a` and a `b`, and
 returns a function that takes a `b` and an `a`.
 Because functions are curried by default, the second pair of parentheses is really unnecessary, because `->`
 is right associative by default.
@@ -1400,7 +1400,7 @@ flip' f y x = f x y
 ```
 ### Maps and filters
 
-**map** Takes a function and a list and applies that fuction to every element in the list, producing a new list.
+**map** Takes a function and a list and applies that function to every element in the list, producing a new list.
 
 The definition of `map` is
 
@@ -1415,7 +1415,7 @@ map f (x:xs) = f x : map f xs
 > [3,4,5,6]
 ```
 
-This is much more readable than the equivelant list comprehension `[x+2 | x <- [1,2,3,4]]`.
+This is much more readable than the equivalent list comprehension `[x+2 | x <- [1,2,3,4]]`.
 
 **filter** is a function that takes a predicate and a list and returns the elements of the list that satisfy the predicate
 
@@ -1434,7 +1434,7 @@ filter p (x:xs)
 > [[1,2,3],[3,4,5],[2,2]]
 ```
 
-Recalling the earlier implementation of QuicSort, we can replace the list comprehensions with calls to filter.
+Recalling the earlier implementation of QuickSort, we can replace the list comprehensions with calls to filter.
 
 ```haskell
 quicksort :: (Ord a) => [a] -> [a]
@@ -1445,7 +1445,7 @@ quicksort (x:xs) =
   in smallerSorted ++ [x] ++ biggerSorted
 ```
 
-**takeWhile** is a funciton that takes a list and a predicate and returns all of the elements from the start of the
+**takeWhile** is a function that takes a list and a predicate and returns all of the elements from the start of the
 list while the predicate returns true
 
 Suppose we wish to find the sum of all odd square that are less than `10000`
@@ -1500,7 +1500,7 @@ As with normal functions, we can pattern match in lambdas.
 > [3,8,9,8,7]
 ```
 
-Due to the way we curry functions, the following two are equivelant
+Due to the way we curry functions, the following two are equivalent
 
 ```haskell
 addThree :: (Num a) => a -> a -> a -> a
@@ -1574,7 +1574,7 @@ Folds can be used to implement any function were you traverse a list once.
 There are also the functions `foldl1` and `foldr1` which do not require a starting value, instead
 assuming that the first value in their traversal order is the starting value.
 
-This would allow an implementation of sum as `sum = foldl1 (+)`, althought it would cause an error
+This would allow an implementation of sum as `sum = foldl1 (+)`, although it would cause an error
 on an empty list.
 
 #### Fold implementations of standard library functions
@@ -1633,7 +1633,7 @@ The `$` function is also called function application.
 f $ x = f x
 ```
 
-Whereas normal function application has the highest precednce, `$` has the lowest precedence.
+Whereas normal function application has the highest precedence, `$` has the lowest precedence.
 
 Function application with a space is left-associative so `f a b c` is the same as `((f a) b) c`.
 Function application with `$` is right associative.
@@ -1656,7 +1656,7 @@ In Haskell, function composition is performed with the `.` function, which is de
 f . g = \x -> f (g x)
 ```
 
-`f` must take as its parameter a value that has the same tpe as `g`'s return value.
+`f` must take as its parameter a value that has the same type as `g`'s return value.
 
 One of the uses for function composition is making functions on the fly to pass to other functions,
 which is often cleaner and more concise than lambdas.
@@ -1678,14 +1678,14 @@ to partially apply them so that each function takes just one parameter.
 `sum (replicate 5 (max 6.7 8.9))` can be rewritten as `(sum . replicate 5. max 6.7) 8.9` or as
 `sum . replicate 5 . max 6.7 $ 8.9`.
 
-What is ahappening is the creation of a function that takes what `max 6.7` takes and applies `replicate 5`
+What is happening is the creation of a function that takes what `max 6.7` takes and applies `replicate 5`
 to it. Then a function that takes the result of that and does a sum of it is create.
 Finally, that unction is called with `8.9`.
 However it is more easily read as taking the value of `max 6.7 8.9`, replicating it `5` times, and taking the
 sum of that replication.
 
 If you want to rewrite a function with lots of parentheses you can start by putting the last parameter of the innermost
-function after a $, and replacing each pair of parenthses with a `.`.
+function after a $, and replacing each pair of parentheses with a `.`.
 
 `replicate 100 (product (map (*3) (zipWith max [1,2,3,4,5] [4,5,6,7,8])))` can be rewritten as
 `replicate 100 . product . map (*3) . zipWith max [1,2,3,4,5] $ [4,5,6,7,8]`.
@@ -1704,16 +1704,16 @@ fn = ceiling . negate . tan . cos . max 50
 
 ## Modules
 
-A Haskell module is a colleciton of related functions, types, and typeclasses.
+A Haskell module is a collection of related functions, types, and typeclasses.
 A program is a collection of modules in which the main module loads up the other modules and
 then uses their functions to perform some process.
 
 Modules provide many advantages.
 If a module is generic enough, the functions it exports can be used in many different programs.
-If code is searated into self-contained modules which aren't too reliant on each other, they
+If code is separated into self-contained modules which aren't too reliant on each other, they
 can be reused later on and changed more easily without having to rewrite other code.
 
-The standard library is split into mldules, each of which contains related functions and types.
+The standard library is split into modules, each of which contains related functions and types.
 
 Modules are imported before the definition of any function with the syntax `import module_name`.
 
@@ -1802,7 +1802,7 @@ The strict fold functions actually compute the intermediate values rather than f
 > [1,2,3,4,5,6,7,8,9]
 ```
 
-**concatMap** is the same as first mapping a function to al ist, and then concatenating the list with `concat`
+**concatMap** is the same as first mapping a function to a list, and then concatenating the list with `concat`
 
 **and** takes a list of values and returns `True` only if all the values in the list are `True`
 
@@ -1849,7 +1849,7 @@ in the form of an infinite list
 
 **span** returns a pair of lists, the first list containing the result of `takeWhile` on the list, and the second list containing the remaining elements
 
-**break** `break p` is the equivelant of `span (not . p)`
+**break** `break p` is the equivalent of `span (not . p)`
 
 **sort** sorts a list of the `Ord` typeclass
 
@@ -1898,15 +1898,15 @@ The type of `find` is `Maybe a` as it can contain `Just a` or `Nothing`.
 
 **words** and **unwords** split a line of text into words or join a list of words respectively
 
-**delete** takes an element and a list and deletes the first occurence of that element in the list
+**delete** takes an element and a list and deletes the first occurrence of that element in the list
 
-**\\** the list differnece function. For every element in the right hand list, it removes a matching element in the left one
+**\\** the list difference function. For every element in the right hand list, it removes a matching element in the left one
 
 **union** returns the union of two lists
 
 **intersect** returns only the elements that are found in both lists
 
-**insert** takes an element and a list of elements that can be sorted and inserts it into the lsat position where it is less than or equal to the next element
+**insert** takes an element and a list of elements that can be sorted and inserts it into the last position where it is less than or equal to the next element
 
 **length**, **take**, **drop** **splitAt**, **!!**, and **replicte** all take **Int** as one of their parameters, or return an **Int**.
 They could be more generic if they took any type that's part of **Integral** or **Num**.
@@ -1925,7 +1925,7 @@ The `Data.Char` module deals with characters
 
 **isSpace** checks whether a character is a white space character
 
-**isLower** checks whether a characer is lower cased
+**isLower** checks whether a character is lower cased
 
 **isUpper** checks whether a character is upper cased
 
