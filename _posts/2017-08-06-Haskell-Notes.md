@@ -2475,3 +2475,430 @@ When declaring a data type, the part before the `=` is the type constructor and 
 
 
 ### Derived instances
+
+A type can be an instance of a typeclass if it supports a particular behaviour.
+
+Haskell can automatically make a type an instance of any of the following typeclasses: `Eq`, `Ord`, `Enum`, `Bounded`, `Show`, `Read`.
+
+When we derive the `Eq` instance for a type and then try to compare two values, Haskell will see if the value constructors match, and it will then check if all the data contained inside matches by testing each pair of fields, each of which also have to be part of the `Eq` typeclass.
+
+We can derive instances for the `Ord` typeclass. If we compare two values of the same type that were made using different constructors, the value which was made with a constructor that's defined first is smaller.
+
+```haskell
+data Bool = False | True deriving (Ord)
+```
+
+Because the `False` constructor is specified first, we can consider `True` to be greater than `False`.
+
+In the `Maybe a` data type, the `Nothing` value constructor is specified before the `Just` value constructor.
+
+
+We can use algebraic data types to make enumerations with the `Enum` and `Bounded` typeclasses.
+
+```haskell
+data Day = Monday | Tuesday | Wednesday | Thursday | Friday | Saturday | Sunday   
+           deriving (Eq, Ord, Show, Read, Bounded, Enum)  
+```
+
+`Day` can be made part of the `Enum` typeclass because all the value constructors are nullary, taking no parameters.
+
+```haskell
+> show Wednesday
+> "Wednesday"
+> read "Saturday" :: Day
+> Saturday
+> Saturday > Friday
+> True
+> minBound :: Day
+> Monday
+> succ Monday
+> Tuesday
+> [Thursday .. Sunday]
+> [Thursday, Friday, Saturday, Sunday]
+```
+
+### Type synonyms
+
+Type synonyms allow giving different names to complex types.
+
+```haskell
+type String = [Char]
+```
+
+We are not actually defining a new type, only creating a synonym for an existing one.
+
+In the same way that functions can be partially applied, type parameters can also be partially applied
+
+```haskell
+type IntMap v = Map Int v
+```
+
+or
+
+```haskell
+type IntMap = Map Int
+```
+
+The `Either` data type takes two types as its parameters.
+
+```haskell
+data Either a b = Left a | Right b deriving (Eq, Ord, Read, Show)
+```
+
+`Either` is useful to return a value and a possinle error.
+
+
+### Recursive data structures
+
+We can make types whose constructors have fields that are of the same type.
+
+```haskell
+data List a = Empty | Cons a (List a) deriving (Show, Read, Eq, Ord)
+```
+
+This list definition is either empty or a combination of a head value and a list.
+`Cons` is another word for `:`.
+
+We can define functions to be automatically infix by making them comprised of special characters.
+
+```haskell
+infixr 5 :-:
+data List a = Empty | a :-: (List a) deriving (Show, Read, Eq, Ord)
+```
+
+When we define functions as operators, we can give them a fixity.
+The fixity states the associativity and the strength of the binding.
+
+```haskell
+> 3 :-: 4 :-: 5 :-: Empty
+> (:-:) 3 ((:-:) 4 ((:-:) 5 Empty))
+```
+
+When deriving `Show` for the type, Haskell will display it as if the constructor was a prefix function.
+
+#### Binary search tree
+
+```haskell
+data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)
+```
+
+Instead of manually building a tree, we can make a function that takes a tree and an element and inserts an element.
+
+```haskell
+singleton :: a -> Tree a
+singleton x = Node x EmptyTree EmptyTree
+
+treeInsert :: (Ord a) => a -> Tree a -> Tree a
+treeInsert x EmptyTree = singleton x
+treeInsert x (Node a left right)
+  | x == a = Node x left right
+  | x < a  = Node a (treeInsert x left) right
+  | x > a  = Node a left (treeInsert x right)
+
+treeElem :: (Ord a) => a -> Tree a -> Bool
+treeElem :: x EmptyTree = False
+treeElem :: x (Node a left right)
+  | x == a = True
+  | x < a = treeElem x left
+  | x > a = treeElem x right
+```
+
+We can use a fold to build up a tree from a list.
+
+```haskell
+> let nums = [8,6,4,1,7,3,5]
+> let numsTree = foldr treeInsert EmptyTree nums
+> numsTree
+> Node 5 (Node 3 (Node 1 EmptyTree EmptyTree) (Node 4 EmptyTree EmptyTree)) (Node 7 (Node 6 EmptyTree EmptyTree) (Node 8 EmptyTree EmptyTree))  
+```
+
+### Typeclasses
+
+The `Eq` typeclass is defined as follows
+
+```haskell
+class Eq a where
+  (==) :: a -> a -> Bool
+  (/=) :: a -> a -> Bool
+  x == y = not (x /= y)
+  x /= y = not (x == y)
+ ```
+
+```haskell
+data TrafficLight = Red | Yellow | Green
+
+instance Eq TrafficLight where
+  Red == Red = True
+  Green == Green = True
+  Yellow == Yellow = True
+  _ == _ = False
+```
+
+While `Eq` could have been implemented automatically, the code above demonstrates how it can be implemented by hand.
+
+The `instance` keyword is for making type instancs of typeclasses.
+Because `==` was defined in terms of '/=' and vice versa in the class declaration, we only had to overwrite one of them in the instance.
+
+```haskell
+instance Show TrafficLight where
+  show Red = "Red light"
+  show Yellow = "Yellow light"
+  show Green = "Green light"
+```
+
+Typeclasses can also be subclasses of other typeclasses.
+
+```haskell
+class (Eq a) => Num a where
+```
+
+This states that we have to make a type an instnace of `Eq` before it can be made an instance of `Num`.
+
+In the declaration of `Eq` we can see that `a` is used as a concrete type because all the types in functions have to be concrete types.
+For `Maybe` we must write
+
+```haskell
+instance Eq (Maybe m) where
+  Just x == Just y = x == y
+  Nothing == Nothing = True
+  _ == _ = False
+```
+
+We must also ensure that `m` is an instance of `Eq` to allow it to be compared.
+
+```haskell
+instance (Eq m) => Eq (Maybe m) where
+  ...
+```
+
+Most of the time, class constraints in class declarations are used for making a typeclass a subclass of another typeclass and class constraints in instance declarations are used to express requirements about the contents of some type.
+
+The `:info` command can be used to display information about a typeclass.
+
+
+### Yes-No typeclass
+
+In some weakly typed languages, anything can be passed to a conditional expression.
+In JavaScript, non empty strings, and non 0 numbers are considered to be `True`.
+
+We could implement this in Haskell
+
+```haskell
+class YesNo a where
+  yesno :: a -> Bool
+
+instance YesNo Int where
+  yesno 0 = False
+  yesno _ = False
+
+instance YesNo [a] where
+  yesno [] = False
+  yesno _ = True
+
+instance YesNo Bool where
+  yesno = id
+-- id is a standard library function which takes a parameter and returns the same thing
+
+instance YesNo (Maybe a) where
+  yesno (Just _) = True
+  yesno Nothing = False
+```
+
+```haskell
+> yesno $ length []
+> False
+> yesno "test"
+> True
+> yesno ""
+> False
+> :t yesno
+> Yesno :: (YesNo a) => a -> Bool
+```
+
+We can now create a function that mimics the if statement, but works with `YesNo` values
+
+```haskell
+yesnoIf :: (YesNo y) => y -> a -> a -> a
+yesnoIf yesnoVal yesResult noResult = if yesno yesnoVal then yesResult else noResult
+```
+
+### The Functor typeclass
+
+```haskell
+class Functor f where
+  fmap :: (a -> b) f a -> f b
+```
+
+The `Functor` typeclass defines a single function, `fmap`.
+`f` is not a concrete type, but a type constructor that takes one parameter.
+`fmap` takes a function from one type to another and a functor applied with one type and returns a functor applied with another type.
+
+The list is an instance of the `Functor` typeclass
+
+```haskell
+instance Functor [] where
+  fmap = map
+```
+
+We didn't write `instance Functor [a]` because from `fmap :: (a -> b) -> f a -> f b` we see that the `f` has to be a type constructor that takes one type.
+`[a]` is a concrete type, while `[]` is a type constructor that takes one type.
+
+Types that can act like a box can be functors.
+`Maybe` can act like a box, holding `Just <something>` or `Nothing`.
+
+```haskell
+instance Functor Maybe where
+  fmap f (Just x) = Just (f x)
+  fmap f Nothing = Nothing
+```
+
+Again we did not specify a type. `Functor` wants a type constructor that takes one type and not a concrete type.
+
+The `Tree a` can be mapped over and made an instance of Functor.
+
+```haskell
+instance Functor Tree where
+  fmap f EmptyTree = EmptyTree
+  fmap f (Node x leftsub rightsub) = Node (f x) (fmap f leftsub) (fmap f righsub)
+```
+
+The `fmap` function for `Tree` recursively applies `f` to each of the items in the `Tree`.
+
+```haskell
+> fmap (*4) (foldr treeInsert EmptyTree [5,7,3,2,1,7])
+> Node 28 (Node 4 EmptyTree (Node 8 EmptyTree (Node 12 EmptyTree (Node 20 EmptyTree EmptyTree)))) EmptyTree  
+```
+
+Now consider `Either a b`.
+The `Functor` typeclass wants a type constructor that takes only one type parameter, but `Either` takes two.
+We can partially apply `Either` by feeding it only one parameter, so that it has one free parameter.
+
+```haskell
+instance Functor (Either a) where
+  fmap f (Right x) = Right (f x)
+  fmap f (Left x) = Left x
+```
+
+`Either a` is a type constructor that takes one parameter.
+The type signature for this specific `fmap` will be `(b -> c) -> Either a b -> Either a c`
+In the implementation, we mapped in the case of a `Right` value constructor but not in the case of a `Left`.
+
+If we wanted to map one function over both of them, `a` and `b` would have to be the same type.
+
+Maps from `Data.Map` can also be made a functor because they hold values. `fmap` will map a function `v -> v'` over a map of type `Map k v` and return a map of type `Map k v'`.
+
+Functors should obey some laws.
+
+* `fmap id = id`
+* `fmap (g . f) = fmap g . fmap f`
+
+
+### Kinds
+
+Functions are also values because we can pass them etc.
+Types are like labels carried by values so that we can reason about them.
+Types have their own labels called **kinds**.
+A **kind** is something like the type of a type.
+
+```haskell
+> :k Int
+> Int :: *
+```
+
+A `*` means that the type is a concrete type, a type without type parameters.
+
+```haskell
+> :k Maybe
+> Maybe :: * -> *
+```
+
+The `Maybe` constructor takes one concrete type, and then returns a concrete type.
+
+```haskell
+> :k Maybe Int
+> Maybe Int :: *
+```
+
+We use `:k` on a type to get its kind, just like `:t` on a value to get its type.
+
+```haskell
+> :k Either
+> Either :: * -> * -> *
+> :k Either Int
+> Either Int :: * -> *
+```
+
+`Either` takes two concrete types as type parameters to produce a concrete type.
+A partially applied either takes a single concrete type to produce a concrete type.
+
+```haskell
+class Tofu t where
+  tofu :: j a -> t a j
+```
+Because `j a` is used as the type of a value that the `tofu` function takes as its parameter, `j a` has to have a kind of `*`.
+We assume `*` for `a` so we can infer that `j` has to have a kind of `* -> *`.
+We see that `t` has to produce a concrete value to, and that it takes two types.
+
+Knowing that `a` has a kind of `*` and `j` has a kind of `* -> *`, we infer that `t` has to have a kind of `* -> (* -> *) -> *`.
+So, it takes a concrete type (`a`), a type constructor that takes one concrete type (`j`) and produces a concrete type.
+
+```haskell
+data Frank a b = Frank {frankField :: b a} deriving (Show)
+```
+
+This type has a kind of `* -> (* -> *) -> *`.
+Fields in algebraic data types are made to hold values, so the must be of kind `*`.
+We assume `*` for `a`, which means that `b` takes one type parameter and so its kind is `* -> *`.
+We now see that `Frank` has a kind of `* -> (* -> *) -> *`.
+
+```haskell
+> :t Frank {frankField = Just "String"}
+> Frank {frankField = Just "String"} :: Frank [Char] Maybe
+> :t Frank {frankField = "String"}
+> Frank {frankField = "String"} :: Frank Char []
+```
+
+Because `frankField` has a type of form `a b`, its values must have types that are of a similar form as well.
+They can be `Just "String"`, which has a type of `Maybe [Char]`, or they can have a value of `['S', 't', 'r', 'i', 'n', 'g']` which has a type of `[Char]`.
+
+Making `Frank` an instance of `Tofu` is quite simple.
+`tofu` takes a `j a`, and returns a type of `t a j`
+
+```haskell
+instance Tofu Frank where
+  tofu x = Frank x
+```
+
+```haskell
+> tofu (Just 'a') :: Frank Char Maybe
+> Frank {frankField = Just 'a'}
+> tofu ["HELLO"] :: Frank [Char] []
+> Frank {frankField = ["HELLO"]}
+```
+
+This has no real use.
+A more complicated type is:
+
+```haskell
+data Barry t k p = Barry { yabba :: p, dabba :: t k}
+```
+
+Now we want to make it an instance of `Functor`.
+`Functor` wants types of kind `* -> *`
+
+It is safe to assume that `p` is a concrete type, and thus has a kind of `*`.
+For `k`, we assume `*`, and so `t` has a kind of `* -> *`.
+
+
+`Barry` has a kind of `(* -> *) -> * -> * -> *`.
+
+Now we can make this type a part of `Functor`.
+We have to partially apply the first two type parameters, so that we are left with `* -> *`.
+
+This means that the start of the instance declaration will be `instance Functor (Barry a b) where`.
+Considering `fmap` specifically for `Barry`, it would have type `fmap :: (a -> b) -> Barry c d a -> Barry c d b` when the `Functor`'s `f` is replaced with `Barry c d`.
+
+```haskell
+instance Functor (Barry a b) where
+  fmap f (Barry {yabba = x, dabba = y}) = Barry {yabba = f x, dabba = y}
+```
