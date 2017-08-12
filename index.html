@@ -19,7 +19,7 @@ title: Notes
              <a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
              {% endfor %}
         </p>
-        <p class="excerpt">{{ post.content | replace: "</p>", "new_line</p>" | replace: "</h4>", "new_line</h4>" | replace: "</h3>", "new_line</h3>" | replace: "</h2>", "new_line</h2>" | strip_html | replace: "new_line", "<br>" | truncatewords: 65 }}</p>
+        <p class="excerpt">{{ post.content | strip_html | truncatewords: 65 }}</p>
       </div>
       <div class="mdl-card__actions mdl-card--border" id="topreducer">
         <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="{{ post.url | relative_url }}">Read More</a>
@@ -27,7 +27,7 @@ title: Notes
 
     </div>
     {% else %}
-      {% assign word_count = 40 %}
+      {% assign word_count = 33 %}
       {% include post_card.html%}
     {% endif %}
   {% endfor %}

@@ -2902,3 +2902,146 @@ Considering `fmap` specifically for `Barry`, it would have type `fmap :: (a -> b
 instance Functor (Barry a b) where
   fmap f (Barry {yabba = x, dabba = y}) = Barry {yabba = f x, dabba = y}
 ```
+
+## Input and output
+
+The function `putStrLn` prints a string
+
+```haskell
+> :t putStrLn
+> putStrLn :: String -> IO ()
+```
+
+`putStrLn` takes a string and returns an IO action, that has a result type of `()`.
+An IO action is something that, when performed, will carry out an action with a side-effect, and will also contain some kind of return value.
+Printing a string doesn't have a meaningful return value, so an empty tuple is returned.
+
+An IO action will be performed when we give it a name of `main` and then run our program.
+
+```haskell
+main = do
+  putStrln "Hello, what is your name?"
+  name <- getLine
+  putStrLn ("Hello" ++ name)
+```
+
+`main` always has a type signature of `main :: IO <type>` where `<type>` is some concrete type.
+By convention, we do not usually specify a type declaration for `main`.
+
+`getLine` reads a line from the input, it has a type `getLine :: IO String`.
+
+The line `name <- getLine` can be read as perform the IO action and then bind its result to `name`.
+As `getLine` has a type `IO String`, `name` will have a type of `String`.
+
+We can only take the data from `getLine` with `<-` from within another IO action.
+`getLine` is impure because its result value is not guaranteed to be the same when performed twice.
+
+In a `do` block, the last action cannot be bound to a name.
+
+IO actions will only be performed when they are given a name of `main` or when they are inside a bigger IO faction that we composed with a `do` block.
+
+```haskell
+main = do
+  line <- getLine
+  if null line
+    then return ()
+    else do
+      putStrLn $ reverseWords line
+      main
+
+reverseWords :: String -> String
+reverseWords = unwords . map reverse . words
+```
+
+The program above reads input and reverses it until a blank line is input.
+
+In an IO `do` block, ifs have to have a form of `if condition then IO action else IO action`.
+
+Because we have to do exactly one IO action after the else, we use a `do` block to glue together two IO actions into one.
+
+### Haskell return
+
+While `return` in most languages ends execution of a method or subroutine, in Haskell (IO actions specifically), it makes an IO action out of the pure value.
+Using `return` **does not** cause the IO `do` block to end execution.
+All these returns do is make IO actions that don't do anything.
+We can use `return` in combination with `<-` to bind to names.
+
+```haskell
+main = do
+  a <- return "String"
+  b <- return "gnirtS"
+  putStrLn $ a ++ " " ++ b
+```
+
+When dealing with IO blocks we mostly use `return` either because we need to create an IO action that does not do anything or because we do not want the IO action that is made up from a `do` block to have the result value of its last action.
+
+### IO functions
+
+**putStr** takes a string as a parameter and returns an IO action that will print without a newline
+
+**putChar** takes a character as a parameter and returns an IO action that will print it
+
+**print** takes a value of a type that is an instance of `Show`, and prints it
+
+**getChar** an IO action that reads a character form input. Reading does not happen until the user presses the enter key
+
+**when** is found in `Control.Monad`. In a `do` block it appears like a control flow statement, but it is a function. It takes a boolean value and an IO action. If the boolean value is `True`, it returns the same IO action passed to it, otherwise it returns the `return ()` action.
+
+**sequence** takes a list of IO actions and returns an IO action which will perform all of the Io actions in the list. `sequence :: [IO a] -> IO [a]`
+
+**mapM** and **mapM_** `mapM` takes a function and a list, maps the function over the list and then sequences it, `mapM_` does the same except that it throws away the result later. `mapM_` is used when we do not care what result our sequenced IO actions have
+
+**forever** located in `Control.Monad`, takes an IO action and returns an IO action that repeats the IO action forever
+
+**forM** located in `Control.Monad`, is like `mapM` except that it has its parameters switched around. The first parameter is the list and the second is the function to map over that list, which is then sequenced
+
+```haskell
+import Control.Monad
+
+main = do
+  colors <- forM [1,2,3,4] (\a -> do
+    putStrLn $ "Which color do you associate with the number " ++ show a ++ "?"
+    color <- getLine
+    return color)
+  putStrLn "The collors that you associate with 1, 2, 3, and 4 are: "
+  mapM putStrLn colors
+```
+
+The `(\a -> do ...)` is a function that takes a number and returns an IO action. We have to surround it with parentheses, otherwise the lambda thinks the last two IO actions below to it.
+We do `return color` in the inside `do` block. We do that so that the IO action which the `do` block defines has the result of our color contained within it.
+We could have left the last line as `getLine`.
+
+The `forM` called with its two parameters, produces an IO action, whose result we bind to `colors`.
+`colors` is just a list of strings. At the end we print out those strings with `mapM putStrLn colors`.
+
+`forM` can be thought of as meaning 'make an IO action for every element in this list, perform those actions and bind their results to something'.
+
+### Files and streams
+
+`getContents` is an IO action that reads everything from the standard input until it encounters an end-of-file character.
+
+Its type is `getContents :: IO String`.
+`getContents` does lazy IO.
+
+The pattern of getting some string from the input, transforming it with a function, and then outputting the result is so common that there exists a function for it.
+
+**interact** takes a function of type `String -> String` as a parameter and returns an IO action that will take some input run that function on it and then print out the function's result.
+
+```haskell
+main = interact shortLinesOnly
+
+shortLinesOnly :: String -> String
+shortLinesOnly input =
+  let allLines = lines input
+    shortLines = filter (\line -> length line < 10) allLines
+    result = unlines shortLines
+  in result
+```
+
+We could write thie in a less readable manner
+
+```haskell
+main = interact $ unlines . filter ((<10) . length) . lines
+```
+
+`interact` can be used to make programs that are piped some contents into them and then dump some result out, or it can be used to make programs that appear to take a line of input from the user, give back some result and then take another line and so on.
