@@ -1,13 +1,19 @@
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{{ page.title }}</title>
-<link href="{{ "/assets/images/icon.png" | relative_url}}" rel="icon" type="image/x-icon" />
+<head>
+	<!-- Meta -->
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+	<meta name="generator" content="Jekyll">
 
-<style type="text/css">
-   {% capture include_to_scssify %}
-     {% include style.scss %}
-   {% endcapture %}
-   {{ include_to_scssify | scssify }}
- </style>
-<script async src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<script async type="text/javascript" src="{{ "/assets/anchorific/anchorific.min.js" | relative_url }}">
-</script>
+	<title>{%if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{%if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+
+	<!-- CSS & fonts -->
+	<link rel="stylesheet" href="{{ "/css/main.css" | prepend: site.baseurl | replace: '//', '/' }}">
+
+	<!-- RSS -->
+	<link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" />
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="img/favicon.png">
+
+</head>

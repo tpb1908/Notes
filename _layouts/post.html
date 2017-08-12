@@ -1,101 +1,25 @@
 ---
 layout: default
 ---
+<article id="post-page">
+	<h2>{%if page.header %}{{ page.header }}{% else %}{{ page.title }}{% endif %}</h2>
+	<time datetime="{{ page.date | date_to_xmlschema }}" class="by-line">{{ page.date | date_to_string }}</time>
+	<p>{% for tag in post.tags %}
+			<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
+		 {% endfor %}
+	</p>
+	<div class="content">
 
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
-</script>
+		{{ content }}
 
-<script defer type="text/javascript">
-  function defer(method) {
-    if (window.jQuery) {
-        method();
-    } else {
-        setTimeout(function() { defer(method) }, 5);
-    }
-  }
-  defer(function() {
-    $(function() {
-      $('.postcontent').anchorific();
+	</div>
 
-      var $sheet = $('.mdl-sheet');
-      if ($sheet.length > 0) {
-        $('html').on('click', function() {
-          $sheet.removeClass('mdl-sheet--opened')
-        });
+	<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
 
-        $sheet.on('click', function(event) {
-          event.stopPropagation();
-
-          $sheet.addClass('mdl-sheet--opened');
-        });
-      }
-
-      var headers = $(":header");
-      console.log(headers);
-      var toc = '<ul class="mdl-list">';
-      headers.each(function(i, elem) {
-        var depth = elem.tagName[1];
-        toc += '\n<li class="mdl-list__item">\n'
-        toc += elem.innerHTML.replace('>', 'style="margin-left: ' + (10*depth) + 'px;">');
-        toc += '\n</li>';
-      })
-      toc += "</ul>";
-      $("#toc").html(toc);
-
-    });
-  });
-</script>
-
-<div class="posts mdl-grid">
-  <div class="mdl-card mdl-shadow--4dp mdl-cell mdl-cell--12-col">
-    <div class="coloredtop" {% if page.color %} style="background-color: {{ page.color }};" {% else %} style="background-color: #333;" {% endif %}>
-      <div class="titlediv">
-        <p class="posttitle" {% if page.textcolor %} style="color: {{ page.textcolor }};" {% else %} style="color: #fb518b;" {% endif %}>{{ page.title }}</p>
-      </div>
-      <div class="mdl-card__menu">
-        <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect mdl-menu-top-right" id="sharemenu">
-          <i class="material-icons">share</i>
-        </button>
-        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="sharemenu">
-          <li class="mdl-menu__item">Facebook</li>
-          <li class="mdl-menu__item">Twitter</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="mdl-card__supporting-text" id="bottomremover">
-      {% assign words = content | number_of_words %}
-      <p id="rightalign"><strong>{{ page.date | date: '%d %B, %Y' }}</strong>&emsp;•&emsp;{% include readtime.html %}&emsp;•&emsp;<strong>Author:</strong> {% if page.author %} {{page.author}} {% else %} Theo {% endif %}</p>
-    </div>
-
-    <div class="postcontent">
-      {{ content }}
-    </div>
-
-  </div>
-
-  <nav class="bottom-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
-    {% if page.previous %}
-    <a href="{{ page.previous.url | prepend: site.baseurl }}" class="bottom-nav__button">
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-              <i class="material-icons">arrow_back</i>
-            </button>
-            Older
-          </a> {% endif %} {% if page.next %}
-    <div class="section-spacer"></div>
-    <a href="{{ page.next.url | prepend: site.baseurl }}" class="bottom-nav__button">
-            Newer
-            <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon mdl-color--white mdl-color-text--grey-900" role="presentation">
-              <i class="material-icons">arrow_forward</i>
-            </button>
-          </a> {% endif %}
-  </nav>
-</div>
-
-<div class="mdl-sheet__container">
-  <div class="mdl-sheet mdl-shadow--2dp">
-    <i class="material-icons mdl-sheet__icon">toc</i>
-
-    <div id="toc" class="mdl-sheet__content">
-    </div>
-  </div>
+	<div id="toc" class="dropdown">
+		<img id="dropdown-button" src="{{ "/img/ic_toc.png" | prepend: site.baseurl | replace: '//', '/' }}"></img>
+		<div id="toc-content" class="dropdown-content">
+		</div>
+	</div>
+</article>

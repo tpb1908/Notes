@@ -1,55 +1,33 @@
 ---
 layout: default
-title: Notes
 ---
+<!-- Posts -->
+<ul id="posts">
 
-<div class="posts mdl-grid">
-  {% for p in paginator.posts %}
-    {% assign post = p%}
-    {% if forloop.first %}
-    {% assign words = post.content | number_of_words %}
-    {% assign tags = post.tags %}
-    <div class="mdl-card mdl-cell mdl-cell--8-col  mdl-shadow--2dp">
-      <div class="mdl-card__title titlebox" style="background-color: #333;">
-        <h2 class="mdl-card__title-text titleborder"><a class="index-titles" href="{{ post.url | relative_url }}" style="color: white;">{{ post.title }}</h2></a>
-      </div>
-      <div class="mdl-card__supporting-text" id="bottomremover">
-        <p><strong>{{ post.date | date: '%B %d, %Y' }}</strong>&emsp;•&emsp;{% include readtime.html %}</p>
-        <p>{% for tag in tags %}
-             <a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
-             {% endfor %}
-        </p>
-        <p class="excerpt">{{ post.content | strip_html | truncatewords: 65 }}</p>
-      </div>
-      <div class="mdl-card__actions mdl-card--border" id="topreducer">
-        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" href="{{ post.url | relative_url }}">Read More</a>
-      </div>
+	{% for post in paginator.posts %}
 
-    </div>
-    {% else %}
-      {% assign word_count = 33 %}
-      {% include post_card.html%}
-    {% endif %}
-  {% endfor %}
+	  <li class="post">
+	  	<h2><a href="{% if site.baseurl == "/" %}{{ post.url }}{% else %}{{ post.url | prepend: site.baseurl }}{% endif %}">{%if post.header %}{{ post.header }}{% else %}{{ post.title }}{% endif %}</a></h2>
+      <time datetime="{{ post.date | date_to_xmlschema }}" class="by-line"> <i>{{ post.date | date_to_string }}</i> </time>
+			<p>{% for tag in post.tags %}
+					<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
+				 {% endfor %}
+			</p>
+			<p>{{ post.content | strip_html | truncatewords:50 }}</p>
+	  </li>
 
-  <nav class="bottom-nav mdl-color-text--grey-50 mdl-cell mdl-cell--12-col">
-            {% if paginator.next_page %}
-            <a href="{{ paginator.next_page_path | relative_url }}" class="bottom-nav__button" title="show previous">
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style=".mdl-button:hover{background-color:white;}">
-                <i class="material-icons" role="presentation">arrow_backward</i>
-              </button>
-              Older
-            </a>
-            {% endif %}
-            {% if paginator.previous_page %}
-            <div class="section-spacer"></div>
-            <a href="{{ paginator.previous_page_path | relative_url }}" class="bottom-nav__button" title="show more">
-              Newer
-              <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" style=".mdl-button:hover{background-color:white;}">
-                <i class="material-icons" role="presentation">arrow_forward</i>
-              </button>
-            </a>
-            {% endif %}
-          </nav>
-        </div>
-</div>
+    {% endfor %}
+
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+			m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-80625972-4', 'auto');
+			ga('require', 'linkid');
+			ga('send', 'pageview');
+
+		</script>
+
+</ul>

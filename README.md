@@ -1,48 +1,131 @@
-# Material Card blog
+## About
+Monochrome is a minimal, responsive, ready to use Jekyll theme for blogging. [Demo](https://dyutibarma.github.io/monochrome/)
+(Built on top of Emerald Jekyll theme)
 
-Built with Jekyll, this blog theme uses Google's [Material Design Lite](https://getmdl.io) framework. Its primary aim is to be fast, responsive and light. With all external resources minified and gzipped, the homepage weighs under 500KB and loads near instantly while maintaining a beautiful design. Subsequent page loads will be faster.
+## Features
+
+- Completely responsive and mobile first
+- Clean SEO friendly URLs, auto-generated from post title (no messy dates in the url)
+- SEO title/description integration
+- Sitemap ready
+- Pagination support
+- Mobile friendly navigation menu
+- Easy customization for header, footer, navigation links, colors, favicon etc
+- Default Monochrome Color Palette - black, white, greys
+- About page
+- 404 page
+- ..and a lot more
+
+## Install/Setup Jekyll
+
+(Skip if you already have Jekyll 2.2)
+
+1. Make sure Ruby 2.2 is installed 
+```
+sudo apt-get install ruby2.2
+sudo apt-get install ruby2.2-dev
+```
+2. Install bundle: `sudo gem install bundler`
+3. Install jekyll: `sudo gem install jekyll`
+
+### Resources
+
+- We found the jekyll tutorials on youtube very quick and useful to get started
+- [Jekyll documentation](http://jekyllrb.com)   
 
 
-A live demo is available [here](https://zogthealien.tk/material-card-blog/).
+## Install Monochrome dependencies
 
-This theme is a stripped down fork of my personal blog, available [here](https://zogthealien.tk/blog/).
+```
+sudo gem install jekyll-paginate
+sudo gem install jekyll-sitemap
 
-# Features
-* Easy to set up
-* Material Design
-* Colors can be changed on a per-post, per-page basis and will be implemented consistently throughout
-* < 500KB
-
-# How to use this theme
-* Fork this repository while logged into your Github account and rename as required
-* `git pull` into your local environment
-* Delete all boilerplate posts in the \_posts directory
-* Add your own posts in the format `YYYY-MM-DD-title-of-post.markdown`
-* Modify site branding in index.html and header.html
-* `git push` back to Github
-* Enable Github Pages in repository settings
-* Done!
-
-# Variables for post
-Every page or post can be configured to use custom colors and authors. The variables used for this are defined in each post's front matter. `color` is for the background color, `textcolor` and `author` are self explanatory. You can also use `title`, and `date` to override defaults set by the post's filename. Jekyll supports more variables but these are the only ones currently implemented.
-
-As for usage, here's an example front matter that you will prefix a blog post with.
-
-```markdown
----
-layout: post
-color: "#dead00"
-textcolor: white
-author: Google
----
 ```
 
-# Reporting Issues and Pull Requests
-Please use the Github Issue Tracker for this, I'd love to hear any and all feedback. Pull requests are also welcome.
+## Get Started with Monochrome
 
-# To be implemented
-* ~~Reduce post padding for mobile~~
-* Normalize font size for H1, H2, H3 sizes in posts
-* Tagging and category system
-* Comments
+### Option 1 
 
+- Fork this repository
+- (Optional) Change the 'baseurl' value in the 'config.yml' file, from '/blog' to your preferred directory/project name (example '/xyz' or '/' to install in root)
+- Clone the forked repository to your local machine to make changes
+- Run 'jekyll serve' and open browser to 'localhost:4000/blog/' to see your changes
+- (Optional) Host with github pages
+
+Note: If you fork the repository, your version of the repository will not be searchable. If you want searchability, we suggest you use the next option.
+
+
+### Option 2
+
+- Simply download the .zip folder from the repository github page
+- Extract the contents from the .zip folder into your local folder
+- cd into monochrome/
+- Run 'jekyll serve' and open browser to 'localhost:4000/blog/' to see your changes
+- Create a repository in github and push the files
+- (Optional) Host with github pages
+
+## Write a Post
+
+- cd into  ``_posts/``
+- create new file with format yyyy-mm-dd-title-of-post.md
+- add title/description (refer any of the test posts)
+- add markdown and save
+
+
+## Customization Options
+
+You can customize this layout using instructions below. 
+
+### Header/Footer/Navigation
+
+Set a custom header tag by setting the related option in the ``_config.yml`` file to "true". Then insert your custom code into the ``header-custom.html`` file.
+In the same way, you can customize the footer of the navigation menu, by setting to "true" the related option and put your code into the ``nav-footer-custom.html`` file.
+Moreover select a reverse option that allows to move the navigation menu to the left side, by setting it to "true".
+
+### Colors
+
+The basic colors are set into the ``base.scss`` file:
+- $background-color: used for background and links in the navigation menu
+- $text-color: used for text and title in posts and pages 
+- $text-light-color: used for text lighter than text-color
+- $text-dark-color: used for text darker than text-color
+
+To customize the colors, just set the values in HEX, RGB (or RGBa) or any other format accepted by CSS.
+
+### Navigation menu
+
+The links inside the navigation menu are autogenerated from pages having the layout set to ``page``.
+You can set custom links, by putting in the ``<a>`` tag into the ``link.html`` file.
+
+### Branch
+There are two branches: 
+- ``master``: is for development.
+- ``gh-pages``: is only for demo site.  
+
+### Baseurl
+
+You can change the 'baseurl' value in the 'config.yml' file, from '/monochrome' to your preferred directory/project name (example '/xyz' or '/' to install in root)
+
+### Typography
+
+To maintain the vertical rhythm, it has been applied a **Typographic scale** as a modular scale, with a baseline set to 24px. To maintain this rhythm you need to insert elements like image, video or other contents with a 24px (or multiple) height as refer.
+
+## Resources
+
+- We found the jekyll tutorials on youtube very quick and useful to get started
+- [Jekyll documentation](http://jekyllrb.com)   
+
+## Todo
+
+- Google Analytics integration
+- Footer to stick to bottom even when content is less
+
+## Author
+
+### TheReviewIndex
+
+- Dyuti Barma
+- Web site: [Review Aggregation and Summary Site for India - TheReviewIndex.com](https://thereviewindex.com)
+
+## License
+Released under [MIT License](license.md).
