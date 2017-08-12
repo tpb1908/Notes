@@ -2,7 +2,7 @@
 
 /* Navigation */
 
-#nav, #nav-left { 
+#nav, #nav-left {
   a {
     display: block;
     color: $text-color;
@@ -42,7 +42,7 @@
 #nav-links {
   @media (max-width: 940px) {
     display:none;
-  }   
+  }
   a {
     padding-left: 10px;
     color: $text-color;
@@ -170,6 +170,51 @@
     }
 }
 
+#toc {
+  ul {
+    list-style-type: none;
+  }
+
+  ul > li {
+      margin-left: 10px;
+  }
+
+
+}
+
+.dropdown {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  z-index: 10;
+}
+
+.dropdown-content {
+    display: none;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1000;
+    overflow:auto;
+    max-height:95vh;  // you choice of number in pixels
+    overflow-x:hidden; // hides the horizontal scroll
+    overflow-y:auto;
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+}
+
+
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    #dropdown-button {
+      display: none;
+    }
+}
+
 .post+.post:before {
     display: block;
     content: '';
@@ -182,7 +227,7 @@
 .by-line {
   display: block;
   color: lighten($text-color, 25%);
-  line-height: 1.8em; 
+  line-height: 1.8em;
   margin-bottom: 1.5em; /* 24px/16px */
   font-weight: 200;
   @media (min-width: 940px) {
@@ -192,6 +237,18 @@
     margin-bottom: 1.3334em; /* 24px/18px */
     font-weight: 200;
   }
+}
+
+table, th, td {
+  border: 1px solid #dfe2e5;
+  border-collapse: collapse;
+  padding: 6px 13px;
+  padding-top: 6px;
+  padding-right: 13px;
+  padding-bottom: 6px;
+  padding-left: 13px;
+  margin-top: 13px;
+  margin-bottom: 13px;
 }
 
 img {
@@ -211,7 +268,7 @@ img[title="Monochrome"] {
 
 code {
   color: lighten($text-color, 35%);
-  background-color: lighten($background-color, 35%);
+  //background-color: lighten($background-color, 35%);
 }
 
 /* Set the vertical rhythm (and padding-left) for lists inside post content */
@@ -220,7 +277,7 @@ code {
   line-height: 1.8em;
   padding-left: 1.5em;
   @media (min-width: 940px) {
-    line-height: 1.8em; 
+    line-height: 1.8em;
   }
 }
 

@@ -12,77 +12,60 @@
     });
     $('#post-page').anchorific();
 
-    console.log("Function running");
 
-    function init() {
-      console.log("init called");
-      var tocContent = createTocContent($("#container :header"), "toc-ul");
-      console.log("Toc content\n" + tocContent);
-      showToc(tocContent);
-    }
+    var elTitleElements = $("#container :header");
+    var ulClass = "toc-ul";
+    var elTitleElementsLen = elTitleElements.length
 
-    function createTocContent(elTitleElements, ulClass) {
-      var elTitleElementsLen = elTitleElements.length
+    var tocContent = ''
+    var tempLists = []
 
-      var tocContent = ''
-      var tempLists = []
+    for (var i = 0; i < elTitleElementsLen; i++) {
+      var j = i + 1
+      var elTitleElement = elTitleElements[i]
+      var elTitleElementName = elTitleElement.tagName
+      //elTitleElementText = (typeof this.process === 'function' ? this.process(elTitleElement) : elTitleElement.innerHTML).replace(/<(?:.|\n)*?>/gm, '')
+      var id = elTitleElement.getAttribute('id')
+      if (!id) {
+        elTitleElement.setAttribute('id', 'tip' + i)
+        id = '#tip' + i
+      } else {
+        id = '#' + id
+      }
 
-      for (var i = 0; i < elTitleElementsLen; i++) {
-        var j = i + 1
-        var elTitleElement = elTitleElements[i]
-        var elTitleElementName = elTitleElement.tagName
-        //elTitleElementText = (typeof this.process === 'function' ? this.process(elTitleElement) : elTitleElement.innerHTML).replace(/<(?:.|\n)*?>/gm, '')
-        var id = elTitleElement.getAttribute('id')
-        if (!id) {
-          elTitleElement.setAttribute('id', 'tip' + i)
-          id = '#tip' + i
+      tocContent += '\n<li><a href="' + id + '">' + elTitleElement.innerHTML + '</a>'
+
+      if (j !== elTitleElementsLen) {
+        elNextTitleElementName = elTitleElements[j].tagName
+        if (elTitleElementName !== elNextTitleElementName) {
+          var checkColse = false
+          var y = 1
+          for (var t = tempLists.length - 1; t >= 0; t--) {
+            if (tempLists[t].tagName === elNextTitleElementName) {
+              checkColse = true
+              break
+            }
+            y++
+          }
+          if (checkColse) {
+            tocContent += new Array(y + 1).join('</li>\n</ul>')
+            tempLists.length = tempLists.length - y
+          } else {
+            tempLists.push(elTitleElement)
+            if (ulClass) { tocContent += '<ul class="' + ulClass + '">' } else { tocContent += '<ul>' }
+          }
         } else {
-          id = '#' + id
+          tocContent += '</li>\n'
         }
-
-        tocContent += '\n<li><a href="' + id + '">' + elTitleElement.innerHTML + '</a>'
-
-        if (j !== elTitleElementsLen) {
-          elNextTitleElementName = elTitleElements[j].tagName
-          if (elTitleElementName !== elNextTitleElementName) {
-            var checkColse = false
-            var y = 1
-            for (var t = tempLists.length - 1; t >= 0; t--) {
-              if (tempLists[t].tagName === elNextTitleElementName) {
-                checkColse = true
-                break
-              }
-              y++
-            }
-            if (checkColse) {
-              tocContent += new Array(y + 1).join('</li>\n</ul>')
-              tempLists.length = tempLists.length - y
-            } else {
-              tempLists.push(elTitleElement)
-              if (ulClass) { tocContent += '<ul class="' + ulClass + '">' } else { tocContent += '<ul>' }
-            }
-          } else {
-            tocContent += '</li>\n'
-          }
+      } else {
+        if (tempLists.length) {
+          tocContent += new Array(tempLists.length + 1).join('</li></ul>')
         } else {
-          if (tempLists.length) {
-            tocContent += new Array(tempLists.length + 1).join('</li></ul>')
-          } else {
-            tocContent += '</li>\n'
-          }
+          tocContent += '</li>\n'
         }
       }
-      if (ulClass) { tocContent = '<ul class="' + ulClass + '">' + tocContent + '</ul>' } else { tocContent = '<ul>' + tocContent + '</ul>' }
-      return tocContent;
     }
-
-    function showToc(tocContent, tocClass) {
-      $("#toc").html(tocContent);
-      // var toc = document.createElement('div')
-      // toc.innerHTML = tocContent
-      // toc.setAttribute('class', tocClass)
-      // document.body.appendChild(toc);
-    }
-    init();
+    if (ulClass) { tocContent = '<ul class="' + ulClass + '">' + tocContent + '</ul>' } else { tocContent = '<ul>' + tocContent + '</ul>' }
+    $("#toc-content").html(tocContent);
   });
 </script>
