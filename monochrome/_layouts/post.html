@@ -1,0 +1,25 @@
+---
+layout: default
+---
+<article id="post-page">
+	<h2>{%if page.header %}{{ page.header }}{% else %}{{ page.title }}{% endif %}</h2>
+	<time datetime="{{ page.date | date_to_xmlschema }}" class="by-line">{{ page.date | date_to_string }}</time>
+	<p>{% for tag in post.tags %}
+			<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
+		 {% endfor %}
+	</p>
+	<div class="content">
+
+		{{ content }}
+
+	</div>
+
+	<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+	</script>
+
+	<div id="toc" class="dropdown">
+		<img id="dropdown-button" src="{{ "/img/ic_toc.png" | prepend: site.baseurl | replace: '//', '/' }}"></img>
+		<div id="toc-content" class="dropdown-content">
+		</div>
+	</div>
+</article>
