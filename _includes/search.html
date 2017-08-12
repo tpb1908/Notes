@@ -4,7 +4,7 @@
   <script defer src="{{ "/assets/tipuesearch/tipuesearch_set.js" | relative_url }}"></script>
   <script defer src="{{ "/assets/tipuesearch/tipuesearch.min.js" | relative_url }}"></script>
   <form action="{{ page.url | relative_url }}" id="search_form">
-    <div class="tipue_search_left"><img src="{{ "/assets/tipuesearch/search.png" | relative_url }}" class="tipue_search_icon"></div>
+    <div class="tipue_search_left"><img src="{{ "/js/tipuesearch/search.png" | prepend: site.baseurl | replace: '//', '/' }}" class="tipue_search_icon"></div>
     <div class="tipue_search_right "><input class="mdl-textfield__input"type="text" name="q" id="tipue_search_input" pattern=".{3,}" title="At least 3 characters" required></div>
     <div style="clear: both;"></div>
   </form>
