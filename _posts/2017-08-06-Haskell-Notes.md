@@ -1,12 +1,10 @@
 ---
 layout: post
-color: "#607d8b"
-textcolor: "#FFFFFF"
 tags: [Notes, Haskell, Functional]
 ---
 
-**Notes from [learnyouahaskell](http://learnyouahaskell.com)**
-# Haskell
+
+This is a collection of notes on Haskell, primarily condensed from [learnyouahaskell](http://learnyouahaskell.com)
 
 ## Purely functional languages
 
