@@ -230,7 +230,8 @@ table, th, td {
 }
 
 .MathJax_Display {
-    overflow-x: scroll;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 img {
