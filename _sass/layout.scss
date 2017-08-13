@@ -223,6 +223,16 @@ table, th, td {
   margin-bottom: 13px;
 }
 
+.table-wrapper {
+  overflow-x: auto;
+  word-break: normal;
+  word-break: keep-all;
+}
+
+.MathJax_Display {
+    overflow-x: scroll;
+}
+
 img {
   max-width: 100%;
   display: block;

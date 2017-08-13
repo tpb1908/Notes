@@ -10,7 +10,7 @@ layout: default
 	</p>
 	<div class="content">
 
-		{{ content }}
+		{{ content | replace: "<table", "<div class=table-wrapper><table" | replace: "/table>", "/table></div>"}}
 
 	</div>
 
