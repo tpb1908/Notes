@@ -4,7 +4,7 @@ layout: default
 <article id="post-page">
 	<h2>{%if page.header %}{{ page.header }}{% else %}{{ page.title }}{% endif %}</h2>
 	<time datetime="{{ page.date | date_to_xmlschema }}" class="by-line">{{ page.date | date_to_string }}</time>
-	<p>{% for tag in post.tags %}
+	<p>{% for tag in page.tags %}
 			<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
 		 {% endfor %}
 	</p>
