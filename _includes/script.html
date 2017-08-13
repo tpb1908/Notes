@@ -1,10 +1,15 @@
-<script src="{{ "/js/main.js" | prepend: site.baseurl | replace: '//', '/' }}"></script>
-<script src="{{ "/js/jquery-3.2.1.min.js" | prepend: site.baseurl | replace: '//', '/' }}"></script>
-<script src="{{ "/js/tipuesearch/tipuesearch_content.js" | prepend: site.baseurl | replace: '//', '/' }}"></script>
-<script src="{{ "/js/tipuesearch/tipuesearch_set.js" | prepend: site.baseurl | replace: '//', '/' }}"></script>
-<script src="{{ "/js/tipuesearch/tipuesearch.min.js" | prepend: site.baseurl | replace: '//', '/' }}"></script>
-<script src="{{ "/js/anchorific/anchorific.min.js" | prepend: site.baseurl | replace: '//', '/' }}"></script>
 <script>
+    {% include main.js %}
+    {% include jquery-3.2.1.min.js %}
+    {% include anchorific.min.js %}
+
+    {% capture search_content%}
+      {% include tipuesearch_content.js %}
+      {% endcapture %}
+    {{ search_content | remove: "---" | remove: "layout: null" | remove: "---" }}
+    {% include tipuesearch_set.js %}
+    {% include tipuesearch.min.js %}
+
   $(document).ready(function() {
     $('#tipue_search_input').tipuesearch({
       'wholeWords' : false,
