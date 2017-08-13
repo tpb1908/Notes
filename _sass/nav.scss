@@ -25,6 +25,6 @@
 
 
 
-.dropdown:hover .dropdown:active .dropdown-content {
+.dropdown:hover, .dropdown:active .dropdown-content {
     display: block;
 }
