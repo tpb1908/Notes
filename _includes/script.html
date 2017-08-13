@@ -16,10 +16,10 @@
         console.log("TOC click");
         event.stopPropagation();
         $('#dropdown-button').hide();
-        $('#toc-content').toggle();
+        $('#toc-content').show();
     });
     $(document).click(function() {
-      $('#toc-content').toggle();
+      $('#toc-content').hide();
       $('#dropdown-button').show();
     });
 
