@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>Monochrome | A minimal, responsive Jekyll blog theme</title>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <id>http://localhost:4000</id>
+ <updated>2017-08-13T20:45:14+01:00</updated>
+ <author>
+   <name>The Review Index</name>
+   <uri>https://thereviewindex.com</uri>
+   <email>dyutibarma@gmail.com</email>
+ </author>
+
+ 
+
+ <entry>
+   <title>Test Post</title>
+   <link href="http://localhost:4000/Test-Post"/>
+   <id>http://localhost:4000/Test-Post</id>
+   <updated>2017-08-12T00:00:00+01:00</updated>
+   <content type="html">&lt;p&gt;Not much here. A few lines of text.&lt;/p&gt;
+
+&lt;h2 id=&quot;heading-level-2&quot;&gt;Heading level 2&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Bold&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-kotlin highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;fun&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;test&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Int&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</content>
+ </entry>
+
+ 
+
+ <entry>
+   <title>Haskell Notes</title>
+   <link href="http://localhost:4000/Haskell-Notes"/>
+   <id>http://localhost:4000/Haskell-Notes</id>
+   <updated>2017-08-06T00:00:00+01:00</updated>
+   <content type="html">&lt;p&gt;This is a collection of notes on Haskell, primarily condensed from &lt;a href=&quot;http://learnyouahaskell.com&quot;&gt;learnyouahaskell&lt;/a&gt;&lt;/p&gt; &lt;h2 id=&quot;purely-functional-languages&quot;&gt;Purely functional languages&lt;/h2&gt; &lt;p&gt;In a purely functional language, functions can have no side effects.&lt;/p&gt; &lt;p&gt;This means that if a function is called twice with the same parameters, it is guaranteed to return the same result. This...</content>
+ </entry>
+
+ 
+
+ <entry>
+   <title>Statistics Notes</title>
+   <link href="http://localhost:4000/Statistics-Notes"/>
+   <id>http://localhost:4000/Statistics-Notes</id>
+   <updated>2017-05-10T00:00:00+01:00</updated>
+   <content type="html">&lt;h2 id=&quot;ss02&quot;&gt;SS02&lt;/h2&gt; &lt;h3 id=&quot;time-series-analysis&quot;&gt;Time series analysis&lt;/h3&gt; &lt;h4 id=&quot;seasonal-variation&quot;&gt;Seasonal variation&lt;/h4&gt; &lt;p&gt;When asked for the type of variation&lt;/p&gt; &lt;p&gt;&lt;strong&gt;Seasonal variation&lt;/strong&gt; If the variations from the fit line appear to follow a pattern&lt;/p&gt; &lt;p&gt;&lt;strong&gt;Random variation&lt;/strong&gt; If they don’t&lt;/p&gt; &lt;h4 id=&quot;moving-averages-and-seasonal-effects&quot;&gt;Moving averages and seasonal effects&lt;/h4&gt; &lt;p&gt;&lt;strong&gt;Moving averages&lt;/strong&gt; For &lt;script type=&quot;math/tex&quot;&gt;\{x_1, x_2, x_3, ..., x_n\},\...</content>
+ </entry>
+
+ 
+
+</feed>

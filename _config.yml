@@ -33,6 +33,10 @@ defaults:
 gems:
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-minifier
+
+jekyll-minifier:
+  exclude: 'atom.xml'
 
 # Custom variables
 version: "1.0.0"
