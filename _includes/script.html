@@ -1,14 +1,14 @@
 <script>
-    {% include main.js %}
-    {% include jquery-3.2.1.min.js %}
-    {% include anchorific.min.js %}
+    {% include _js/main.js %}
+    {% include _js/jquery-3.2.1.min.js %}
+    {% include _js/anchorific.min.js %}
 
     {% capture search_content%}
-      {% include tipuesearch_content.js %}
+      {% include _js/tipuesearch_content.js %}
       {% endcapture %}
     {{ search_content | remove: "---" | remove: "layout: null" | remove: "---" }}
-    {% include tipuesearch_set.js %}
-    {% include tipuesearch.min.js %}
+    {% include _js/tipuesearch_set.js %}
+    {% include _js/tipuesearch.min.js %}
 
   $(document).ready(function() {
     $('#tipue_search_input').tipuesearch({
