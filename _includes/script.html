@@ -12,6 +12,15 @@
     });
     $('#post-page').anchorific();
 
+    $('#dropdown-button').click(function() {
+        console.log("TOC click");
+        var content = document.getElementById('toc-content');
+        if (content.style.display == "block") {
+          content.style.display = "none";
+        } else {
+          content.style.display = "block";
+        }
+    });
 
     var elTitleElements = $("#container :header");
     var ulClass = "toc-ul";
@@ -24,7 +33,6 @@
       var j = i + 1
       var elTitleElement = elTitleElements[i]
       var elTitleElementName = elTitleElement.tagName
-      //elTitleElementText = (typeof this.process === 'function' ? this.process(elTitleElement) : elTitleElement.innerHTML).replace(/<(?:.|\n)*?>/gm, '')
       var id = elTitleElement.getAttribute('id')
       if (!id) {
         elTitleElement.setAttribute('id', 'tip' + i)

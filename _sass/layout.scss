@@ -33,10 +33,12 @@
 
 #nav.menu-open {
   @include open(-14rem);
+  z-index: 100;
 }
 
 #nav-left.menu-open-left {
   @include open(14rem);
+  z-index: 100;
 }
 
 #nav-links {
@@ -68,6 +70,7 @@
   @media (min-width: 940px) {
     display:none;
   }
+  z-index: 500;
 }
 
 #nav-menu-left {
@@ -75,6 +78,7 @@
   @media (min-width: 940px) {
     display:none;
   }
+  z-index: 500;
 }
 
 #menu {
@@ -182,38 +186,6 @@
 
 }
 
-.dropdown {
-  position: fixed;
-  right: 32px;
-  bottom: 32px;
-  z-index: 10;
-}
-
-.dropdown-content {
-    display: none;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    padding: 12px 16px;
-    z-index: 1000;
-    overflow:auto;
-    max-height:95vh;  // you choice of number in pixels
-    overflow-x:hidden; // hides the horizontal scroll
-    overflow-y:auto;
-
-    ::-webkit-scrollbar {
-      display: none;
-    }
-}
-
-
-
-.dropdown:hover .dropdown-content {
-    display: block;
-    #dropdown-button {
-      display: none;
-    }
-}
 
 .post+.post:before {
     display: block;
