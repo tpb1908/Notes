@@ -3043,3 +3043,9 @@ main = interact $ unlines . filter ((<10) . length) . lines
 ```
 
 `interact` can be used to make programs that are piped some contents into them and then dump some result out, or it can be used to make programs that appear to take a line of input from the user, give back some result and then take another line and so on.
+
+```haskell
+respondPalindromes contents = unlines (map (\xs ->
+  if isPalindrome xs then "palindrome" else "not a palindrome") (lines contents))
+  where isPalindrome xs = xs == reverse xs
+```

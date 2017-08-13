@@ -1,14 +1,13 @@
 # Site settings
 title: Monochrome | A minimal, responsive Jekyll blog theme
 description: "A minimal, responsive, ready to use blog template, built with Jekyll."
-url: "http://www.tpb1908.github.io/Notes"
+url: "http://www.tpb1908.github.io"
 author:
   name: "The Review Index"
   email: "dyutibarma@gmail.com"
   url: "https://thereviewindex.com"
 
 # Build settings
-baseurl: /Notes # Change this to your relative path (ex: /blog/), or leave just a /
 markdown: kramdown
 source: .
 destination: ./_site
