@@ -12,15 +12,16 @@
     });
     $('#post-page').anchorific();
 
-    // $('#dropdown-button').click(function() {
-    //     console.log("TOC click");
-    //     var content = document.getElementById('toc-content');
-    //     if (content.style.display == "block") {
-    //       content.style.display = "none";
-    //     } else {
-    //       content.style.display = "block";
-    //     }
-    // });
+    $('#dropdown-button').click(function(event) {
+        console.log("TOC click");
+        event.stopPropagation();
+        $('#dropdown-button').hide();
+        $('#toc-content').toggle();
+    });
+    $(document).click(function() {
+      $('#toc-content').toggle();
+      $('#dropdown-button').hide();
+    });
 
     var elTitleElements = $("#container :header");
     var ulClass = "toc-ul";

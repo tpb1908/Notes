@@ -14,7 +14,7 @@
     padding: 12px 16px;
     z-index: 1000;
     overflow:auto;
-    max-height:95vh;  // you choice of number in pixels
+    max-height:80vh;  // you choice of number in pixels
     overflow-x:hidden; // hides the horizontal scroll
     overflow-y:auto;
 
@@ -24,7 +24,7 @@
 }
 
 
-
-.dropdown:hover, .dropdown:active .dropdown-content {
-    display: block;
-}
+//
+// .dropdown:hover, .dropdown:active .dropdown-content {
+//     display: block;
+// }
