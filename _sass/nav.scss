@@ -33,3 +33,12 @@
     }
 
 }
+
+#toc {
+  ul {
+    list-style-type: none;
+  }
+  ul > li {
+      margin-left: 10px;
+  }
+}

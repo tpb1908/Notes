@@ -3,11 +3,15 @@ layout: default
 ---
 <article id="post-page">
 	<h2>{%if page.header %}{{ page.header }}{% else %}{{ page.title }}{% endif %}</h2>
-	<time datetime="{{ page.date | date_to_xmlschema }}" class="by-line">{{ page.date | date_to_string }}</time>
-	<p>{% for tag in page.tags %}
-			<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
-		 {% endfor %}
-	</p>
+	<div class="post-info">
+		<time datetime="{{ page.date | date_to_xmlschema }}" class="by-line">{{ page.date | date_to_string }}</time>
+		<span>&middot;</span>
+		<p>{% for tag in page.tags %}
+				<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
+			 {% endfor %}
+		</p>
+	</div>
+
 	<div class="content">
 
 		{{ content | replace: "<table", "<div class=table-wrapper><table" | replace: "/table>", "/table></div>"}}
