@@ -1,9 +1,13 @@
 
 .dropdown {
   position: fixed;
-  right: 5%;
-  bottom: 1%;
   z-index: 10;
+  bottom: 1%;
+  right: 5%;
+  .img {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .dropdown-content {
@@ -22,9 +26,3 @@
       display: none;
     }
 }
-
-
-//
-// .dropdown:hover, .dropdown:active .dropdown-content {
-//     display: block;
-// }
