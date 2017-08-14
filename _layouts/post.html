@@ -7,7 +7,7 @@ layout: default
 		<time datetime="{{ page.date | date_to_xmlschema }}" class="by-line">{{ page.date | date_to_string }}</time>
 		<span>&middot;</span>
 		<p>{% for tag in page.tags %}
-				<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
+				<a href="tags#{{ tag | slugify }}"> {{ tag }} </a>
 			 {% endfor %}
 		</p>
 	</div>
@@ -26,4 +26,5 @@ layout: default
 		<div id="toc-content" class="dropdown-content">
 		</div>
 	</div>
+
 </article>

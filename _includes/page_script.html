@@ -1,0 +1,83 @@
+<script>
+  {% include _js/anchorific.min.js %}
+
+  {% capture search_content%}
+    {% include _js/tipuesearch_content.js %}
+    {% endcapture %}
+  {{ search_content | remove: "---" | remove: "layout: null" | remove: "---" }}
+  {% include _js/tipuesearch_set.js %}
+  {% include _js/tipuesearch.min.js %}
+
+  $(document).ready(function() {
+    $('#tipue_search_input').tipuesearch({
+      'wholeWords' : false,
+      'showURL' : false,
+    });
+    $('#post-page').anchorific();
+
+    $('#dropdown-button').click(function(event) {
+        console.log("TOC click");
+        event.stopPropagation();
+        $('#dropdown-button').hide();
+        $('#toc-content').show();
+    });
+    $(document).click(function() {
+      $('#toc-content').hide();
+      $('#dropdown-button').show();
+    });
+
+    var elTitleElements = $("#container :header");
+    var ulClass = "toc-ul";
+    var elTitleElementsLen = elTitleElements.length
+
+    var tocContent = ''
+    var tempLists = []
+
+    for (var i = 0; i < elTitleElementsLen; i++) {
+      var j = i + 1
+      var elTitleElement = elTitleElements[i]
+      var elTitleElementName = elTitleElement.tagName
+      var id = elTitleElement.getAttribute('id')
+      if (!id) {
+        elTitleElement.setAttribute('id', 'tip' + i)
+        id = '#tip' + i
+      } else {
+        id = '#' + id
+      }
+
+      tocContent += '\n<li>' + elTitleElement.innerHTML;
+
+      if (j !== elTitleElementsLen) {
+        elNextTitleElementName = elTitleElements[j].tagName
+        if (elTitleElementName !== elNextTitleElementName) {
+          var checkColse = false
+          var y = 1
+          for (var t = tempLists.length - 1; t >= 0; t--) {
+            if (tempLists[t].tagName === elNextTitleElementName) {
+              checkColse = true
+              break
+            }
+            y++
+          }
+          if (checkColse) {
+            tocContent += new Array(y + 1).join('</li>\n</ul>')
+            tempLists.length = tempLists.length - y
+          } else {
+            tempLists.push(elTitleElement)
+            if (ulClass) { tocContent += '<ul class="' + ulClass + '">' } else { tocContent += '<ul>' }
+          }
+        } else {
+          tocContent += '</li>\n'
+        }
+      } else {
+        if (tempLists.length) {
+          tocContent += new Array(tempLists.length + 1).join('</li></ul>')
+        } else {
+          tocContent += '</li>\n'
+        }
+      }
+    }
+    if (ulClass) { tocContent = '<ul class="' + ulClass + '">' + tocContent + '</ul>' } else { tocContent = '<ul>' + tocContent + '</ul>' }
+    $("#toc-content").html(tocContent);
+  });
+</script>

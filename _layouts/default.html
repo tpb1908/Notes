@@ -60,13 +60,17 @@
         {% endif %}
 
 	  </div>
-		
+
 	    <!-- Footer -->
 	    {% include footer.html %}
 
 	    <!-- Script -->
       {% include script.html %}
 
+			<!-- If the date exists we are on a post -->
+			{% if page.date %}
+				{% include page_script.html%}
+			{% endif %}
 	</div>
 </body>
 </html>

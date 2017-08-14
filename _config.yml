@@ -32,7 +32,7 @@ defaults:
 gems:
   - jekyll-paginate
   - jekyll-sitemap
-  - jekyll-minifier
+  # - jekyll-minifier
 
 jekyll-minifier:
   exclude: 'atom.xml'
