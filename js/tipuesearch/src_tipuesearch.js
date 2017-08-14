@@ -410,6 +410,7 @@ defer(function() {
             }
           }
           $('#tipue_search_content').hide().html(out).slideDown(200);
+					window.scrollTo(0,document.body.scrollHeight);
           $('#tipue_search_replaced').click(function() {
             getTipueSearch(0, false);
           });
