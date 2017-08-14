@@ -3111,3 +3111,247 @@ Calling `openTempFile "." "temp"` will open a temporary file in the current dire
 **renameFile** renames a file at a path
 
 ### Command line arguments
+
+The `System.Environment` module as IO actions for dealing with arguments.
+
+**getArgs** has type `getArgs :: IO [String]`.
+
+**getProgName** has a type of `getProgName :: IO String`
+
+```haskell
+import System.Environment
+import Data.List
+
+main = do
+  args <- getArgs
+  progName <- getProgName
+  putStrLn "The arguments are: "
+  mapM putStrLn args
+  putStrLn "The program name is: "
+  putStrLn progName
+```
+
+```
+$ ./arg-test first second third "multi word argument"
+The arguments are:
+first
+second
+third
+multi word arguments
+The program name is:
+arg-test
+```
+
+#### TODO
+
+We can now write a program to manage tasks.
+
+- View tasks
+- Add tasks
+- Delete tasks
+
+```haskell
+import System.Environment
+import System.Directory
+import System.IO
+import Data.List
+
+dispatch :: [(String, [String] -> IO ())]
+dispatch = [ ("add", add)
+           , ("view", view)
+           , ("remove", remove)
+            ]
+```
+
+We now need to define `main`, `add`, `view`, and `remove`.
+
+```haskell
+main = do
+  (command:args) <- getArgs
+  let (Just action) = lookup command dispatch
+  action args
+```
+
+First we get the arguments, and split them into the command and its arguments.
+We then look up our command in the dispatch list, and call it with the arguments.
+
+```haskell
+add :: [String] -> IO ()
+add [fileName, todoItem] = appendFile fileName (todoItem ++ "\n")
+```
+
+```haskell
+view :: [String] -> IO ()
+view [fileName] = do
+  contents <- readFile fileName
+  let todoTasks = lines contents
+      numberedTasks = zipWith (\n line -> show n ++ " - " ++ line) [0..] todoTasks
+  putStr $ unlines numberedTasks
+```
+
+```haskell
+remove :: [String] -> IO ()
+remove [fileName, numberString] = do
+  handle <- openFile fileName ReadMode
+  (tempNam, tempHandle) <- openTempFile "." "temp"
+  contents <- hGetContents handle
+  let number = read numberString
+      todoTasks = lines contents
+      newTodoItems = delete (todoTasks !! number) todoTasks
+  hPutStr tempHandle $ unlines newTodoItems
+  hClose handle
+  hClose tempHandle
+  removeFile fileName
+  rename tempName fileName
+```
+
+We opened the file, added a temporary file, deleted the line with the index, wrote the result to a temporary file, removed the original file, and renamed the temporary file to the original file name.
+
+
+### Randomness
+
+The `System.Random` module has all the functions needed for randomness.
+
+**random** has type `random :: (RandomGen g, Random a) => g -> (a, g)`
+
+The `RandomGen` typeclass is for types that can act as sources of randomness.
+The `Random` typeclass is for things that can take random values.
+
+`System.Random` exports a random generator called `StdGen`.
+To manually make a random generator, use the `mkStdGen` function, which takes an `Int`.
+
+
+```haskell
+> random (mkStdGen 100) :: (Int, StdGen)
+> (-1352021624,651872571 1655838864)
+```
+
+The first component of the tuple is our random number, whereas the second component is a textual representation of our new random generator.
+
+We use the type annotation to get different types.
+
+```haskell
+> random (mkStdGen 949488) :: (Float, StdGen)  
+> (0.8938442,1597344447 1655838864)  
+> random (mkStdGen 949488) :: (Bool, StdGen)  
+> (False,1485632275 40692)  
+> random (mkStdGen 949488) :: (Integer, StdGen)  
+> (1691547873,1597344447 1655838864)  
+```
+
+We use the returned generator to produce new random values.
+
+```haskell
+threeCoins :: StdGen -> (Bool, Bool, Bool)
+threeCoins gen =
+  let (first, newGen) = random gen
+      (second, newGen') = random newGen
+      (third, newGen'') = random newGen'
+  in (first, second, third)
+```
+
+**randoms** takes a generator and returns an infinite sequence of values based on that generator
+
+It could be written as
+
+```haskell
+randoms' :: (RandomGen g, Random a) => g -> [a]
+randoms' gen = let (value, newGen) = random gen in value:randoms' newGen
+```
+
+We could generate a finite stream of random numbers as follows
+
+```haskell
+finiteRandoms :: (RandomGen g, Random a, Num n) => n -> g -> ([a], g)
+finiteRandoms 0 gen = ([], gen)
+finiteRandoms n gen =
+  let (value, newGen) = random gen
+      (restOfList, finalGen) = finiteRandoms (n-1) newGen
+  in (value:restOfList, finalGen)
+```
+
+**randomR** creates a random value within a given range, it has type signature `randomR :: (RandomGen g, Random a) :: (a, a) -> g -> (a, g)`
+
+**randomRs** produces a stream of random values defined within a range
+
+In order to generate different random numbers each time the program is run, we use `getStdGen` which has a type of `IO StdGen`.
+It asks the system for a good random number generator and stores that in a "global generator".
+
+Another method is **newStdGen**, which splits the current generator into two generators, updating the global generator with one of them and encapsulating the other as its result.
+
+### ByteStrings
+
+Processing files as strings tends to be slow.
+
+`ByteString`s are similar to lists, except that each element is one byte, and laziness is handled differently.
+
+Strict ByteStrings reside in `Data.ByteString` and they are not lazy.
+There is less overhead because there are no thunks, but they use more memory which might not be necessary.
+
+Lazy ByteStrings reside in `Data.ByteString.Lazy`. They are lazy, but not as lazy as lists.
+In a list there are as many thunks as there are elements.
+ByteStrings are stored in chunks of 64K, each of which have thunk.
+
+**pack** has type signature `pack :: [Word8] -> ByteString`. It takes a list of bytes of type `Word8` and returns a `ByteString`
+
+**unpack** converts a ByteString to a list of bytes
+
+**fromChunks** takes a list of strict ByteStrings and converts them to a lazy ByteString
+
+**toChunks** takes a lazy ByteString and converts it into a list of strict ones
+
+The ByteString version of `:` is called `cons`. It takes a byte and a ByteString and puts the byte at its beginning.
+It is lazy and will make a new chunk even if the first chunk in the ByteString is not full.
+
+`cons'` is strict and will not make a new chunk unless necessary.
+
+**empty** makes an empty ByteString
+
+The `ByteString` module has other functions analogous to those in `Data.List`.
+
+### Exceptions
+
+Despite having expressive types that support failed computations, Haskell still has support for exceptions because they make more sense in IO contexts.
+
+Pure code can throw exceptions, but they can only be caught in the IO part of the code.
+This is because you do not know when (or if) anything will be evaluated in pure code, because it is lazy and does not have a well-defined order of execution, whereas IO code does.
+
+#### IO exceptions
+
+IO exceptions are exceptions that are caused when there is an error while communicating outside of the program.
+
+When opening a file we can use `doesFileExist` from `System.Directory` before opening the file.
+
+To handle IO exceptions we can use the `catch` function from `System.IO.Error` which has type signature `catch :: IO a -> (IOError -> IO a) -> IO a`.
+The first parameter is an IO action, the second is a handler function which handles the `IOError`.
+
+
+```haskell
+import System.Environment
+import System.IO
+import System.IO.Error
+
+main = toTry `catch` handler
+
+toTry :: IO ()
+toTry = do (fileName:_) <- getArgs
+           contents <- readFile fileName
+           putStrLn $ "The file has " ++ show (length (lines contents)) ++ " lines."
+
+handler :: IOError -> IO ()
+handler e = putStrLn "Error reading file"
+```
+
+There are several predicates that act on IOError
+
+- **isAlreadyExistsError**
+- **isDoesNotExistError**
+- **isAlreadyInUseError**
+- **isFullError**
+- **isEOFError**
+- **isIllegalOperation**
+- **isPermissionError**
+- **isUserError** 
+
+`System.IO.Error` also exports functions that enable us to ask our exceptions for some attributes.
+Each function starts with `ioe`, and can be found [here](https://downloads.haskell.org/~ghc/6.10.1/docs/html/libraries/base/System-IO-Error.html#3).
