@@ -3048,4 +3048,66 @@ main = interact $ unlines . filter ((<10) . length) . lines
 respondPalindromes contents = unlines (map (\xs ->
   if isPalindrome xs then "palindrome" else "not a palindrome") (lines contents))
   where isPalindrome xs = xs == reverse xs
+
+main = interact respondPalindromes
 ```
+
+**openFile** has a type signature `openFile :: FilePath -> IOMode -> IO Handle`
+
+`FilePath` is a type synonym for `String`.
+`IOMode` is a type defined as
+
+```haskell
+data IOMode = ReadMode | WriteMode | AppendMode | ReadWriteMode
+```
+
+The function returns an IO action that will open the specified file in the specified mode. If we bind that action to something we get a `Handle`.
+A value of type `Handle` represents where the file is.
+
+**hGetContents** takes a `Handle` and returns an `IO String`, an `IO` action that holds as its results the contents of the file.
+
+Files handles must be closed with `hClose`, which returns an IO action that closes the file.
+
+**withFile** has a type signature `withFile :: FilePath -> IOMode -> (Handle -> IO a) -> IO a`.
+It takes a path to a file, an `IOMode` and a function that takes a handle and returns some IO actions.
+It returns an IO action that will open the file, do something with it and then close it.
+
+```haskell
+import System.IO
+
+main = do
+  withFile "test.txt" ReadMode (\handle -> do
+    contents <- hGetContents handle
+    putStr contents)
+```
+
+An alternate `withFile` could be written as
+
+```haskell
+withFile' :: FilePath -> IOMode -> (Handle -> IO a) -> IO a
+withFile' path mode f = do
+  handle <- openFile path mode
+  result <- f handle
+  hClose handle
+  return result
+```
+
+**hGetLine**, **hPutStr**, **hPutStrLn**, **hGetChar**, work like their counterparts without the **h**, except that they take a handle as a parameter and operate on that specific file instead of operating on standard input or output.
+
+**readFile** has a type signature `readFile :: FilePath -> IO String`. It lazily loads a file as a string. As there is no handle, it does not have to be closed manually.
+
+**writeFile** has a type signature of `writeFile :: FilePath -> String -> IO ()`. It takes a path to a file and a string to write to that file and returns an IO action that will do the writing. If a file exists already, its contents will be erased.
+
+**appendFile** has a type signature just like `writeFile`, but it does not erase the pre-existing file.
+
+**hFlush** takes a handle and returns an IO action that will flush the buffer of the file associated with the handle. This causes any items buffered for output to be immediately sent to the operating system
+
+**openTempFile** Takes a path to a temporary directory and a template name for a file and opens a temporary file.
+
+Calling `openTempFile "." "temp"` will open a temporary file in the current directory with the name "temp" plus some random characters.
+
+**removeFile** takes a path and deletes it
+
+**renameFile** renames a file at a path
+
+### Command line arguments
