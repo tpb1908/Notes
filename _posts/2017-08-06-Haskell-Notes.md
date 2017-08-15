@@ -3351,7 +3351,153 @@ There are several predicates that act on IOError
 - **isEOFError**
 - **isIllegalOperation**
 - **isPermissionError**
-- **isUserError** 
+- **isUserError**
 
 `System.IO.Error` also exports functions that enable us to ask our exceptions for some attributes.
 Each function starts with `ioe`, and can be found [here](https://downloads.haskell.org/~ghc/6.10.1/docs/html/libraries/base/System-IO-Error.html#3).
+
+## Functionally solving problem s
+
+### Reverse Polish notation calculator
+
+We want to take a string as a parameter and produce a numeric value as a result `solveRPN :: (Num a) => String -> a`.
+
+Take the RPN string "10 4 3 + 2 * -".
+
+- We push 10 to the stack [10]
+- We push 4 to the stack [10, 4]
+- We push 3 to the stack [10, 4, 3]
+- We reach '+' so we pop the top two items from the stack, apply the operator and push the result to the stack [10, 7]
+- We push 2 to the stack [10, 7, 2]
+- We reach '\*' so we pop the top two items from the stack, apply the operator and push the result to the stack [10, 14]
+- We reach the '-' so we pop the top two items from the stack, apply the operator and push the result to the stack [-4]
+
+As we are effectively traversing a list form left to right and building up a result, we can apply a fold.
+
+The function may look like
+
+```haskell
+import Data.List
+
+solveRPN :: (Num a) => String -> a
+solveRPN expression = head (foldl foldingFunction [] (words expression))
+  where foldingFunction stack item = ...
+```
+
+The accumulator is our stack, which is initially empty.
+We are folding over the input string split into words.
+
+```haskell
+solveRPN :: (Num a, Read a) => String -> a  
+solveRPN = head . foldl foldingFunction [] . words  
+  where foldingFunction (x:y:ys) "*" = (x * y):ys  
+        foldingFunction (x:y:ys) "+" = (x + y):ys  
+        foldingFunction (x:y:ys) "-" = (y - x):ys  
+        foldingFunction xs numberString = read numberString:xs  
+```
+
+This function can be easily modified to support more operators.
+
+
+### Pathfinding
+
+There are two main roads and a number of regional roads crossing between them.
+It takes a fixed amount of time to travel from one point to another.
+
+```
+A-50-A1--5-A2-40-A3-10-
+     |     |     |
+     30    20    25
+     |     |     |
+B-10-B1-90-B2--2-B3--8-
+```
+
+The input for this case can be represented as
+
+```
+50
+10
+30
+5
+90
+20
+40
+2
+25
+10
+8
+0
+```
+
+The input file can be read in threes.
+
+Finding the shortest path to the first crossroad is trivial.
+We can see that it is faster to move from B to B1 and then to A1 than to travel from A to A1.
+
+We now know that the fastest path to A1 is 40, and the fastest path to B1 is 10.
+
+We can now consider A2 and B2.
+A2 can be reached either by moving forward from A1, or moving forward from B1 and then crossing over.
+It takes 40 to get to A1, and then 5 from A1 to A2, for a total of 45 which is less than the total of 110 from B to B1 to B2 to A2.
+
+Considering B2, it takes 65 to travel from A1 to A2 to B2, and 100 to travel from B to B1 to A2.
+
+We can repeat this process until we reach the end.
+Once we get to the end the faster route is the optimal path.
+
+We need to represent the road system with Haskell's data types.
+
+```haskell
+data Section = Section { getA :: Int, getB :: Int, getC :: Int} deriving (Show)
+type RoadSystem = [Section]
+```
+
+`Section` is a simple algebraic data type that holds three integers for the lengths of its three road parts.
+
+Our road system can now be represented as follows
+
+```haskell
+system :: RoadSystem
+system = [Section 50 10 30, Section 5 90 20, Section 40 2 25, Section 10 8 0]
+```
+
+```haskell
+data Label = A | B | C deriving (Show)
+type Path = [(Label, Int)]
+```
+
+We will create a function with a type declaration `optimalPath :: RoadSystem -> Path`.
+
+We will walk over the list with the sections from left to right and keep the optimal path on A and optimal path on B as we go along.
+We will accumulate the best path as we walk over the list, left to right.
+
+We repeatedly check the optimal step.
+Consider `Section 50 10 30`. We conclude that the new optimal path to A1 is `[(B, 10),(C, 30)]` and the optimal path to B1 is `[(B, 10)]`.
+Considering this step as a function it has a type signature `(Path, Path) -> Section -> (Path, Path)`.
+
+```haskell
+roadStep :: (Path, Path) -> Section -> (Path, Path)  
+roadStep (pathA, pathB) (Section a b c) =   
+    let priceA = sum $ map snd pathA  
+        priceB = sum $ map snd pathB  
+        forwardPriceToA = priceA + a  
+        crossPriceToA = priceB + b + c  
+        forwardPriceToB = priceB + b  
+        crossPriceToB = priceA + a + c  
+        newPathToA = if forwardPriceToA <= crossPriceToA  
+                        then (A,a):pathA  
+                        else (C,c):(B,b):pathB  
+        newPathToB = if forwardPriceToB <= crossPriceToB  
+                        then (B,b):pathB  
+                        else (C,c):(A,a):pathA  
+    in  (newPathToA, newPathToB)  
+```
+
+```haskell
+optimalPath :: RoadSystem -> Path
+optimalPath roadSystem =
+  let (bestAPath, bestBPath) = foldl roadStep ([],[]) roadSystem
+  in if sum (map snd bestAPath) <= sum (map snd bestBPath)
+    then reverse bestAPath
+    else reverse bestBPath
+```
