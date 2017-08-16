@@ -6,13 +6,16 @@ tags: [Notes, Haskell, Functional]
 
 This is a collection of notes on Haskell, primarily condensed from [learnyouahaskell](http://learnyouahaskell.com)
 
-## Purely functional languages
+<snippet></snippet>
+
+### Purely functional languages
 
 In a purely functional language, functions can have no side effects.
 
 This means that if a function is called twice with the same parameters, it is guaranteed to return the same result. This is called referential transparency and allows the compiler to reason about program behaviour, as well as proof that a function is correct.
 
-## Lazy evaluation
+
+### Lazy evaluation
 
 Functions will not be called and calculations will not be performed until a result is required.
 Programs can be thought of as a series of transformations on data.
@@ -656,11 +659,11 @@ Explicit types are always denoted with the first letter in capital case.
 Functions also have types. When writing functions, we can give an explicit type declaration.
 
 ```haskell
-removeNonUpercase :: [Char] -> [Char]
-removeNonUpercase st = [ c | c <- st, c `elem` ['A'..'Z']]
+removeNonUppercase :: [Char] -> [Char]
+removeNonUppercase st = [ c | c <- st, c `elem` ['A'..'Z']]
 ```
 
-`removeNonUpercase` has a type of `[Char] -> [Char]` as it maps a string to a string.
+`removeNonUppercase` has a type of `[Char] -> [Char]` as it maps a string to a string.
 We don't have to give this function a type decleration because the compiler can infer it, however it is still good practice to do so.
 
 ```haskell
@@ -832,7 +835,7 @@ To be part of `Num`, a type must also be part of `Show` and `Eq`.
 
 **Floating** Is a numeric typeclass containing `Float` and `Double`
 
-The `fromIntegral` function has a type declaration of `fromInegral :: (Num b, Integral a) => a -> b`.
+The `fromIntegral` function has a type declaration of `fromIntegral :: (Num b, Integral a) => a -> b`.
 It takes an integral number and turns it into a more general number.
 
 ## Syntax in functions
@@ -938,7 +941,7 @@ sum' (x:xs) = x + sum` xs
 
 ### Patterns
 
-Patterns are a method of breaking something up according to a pattern and binding it to names whilst still keeping a refernce to the whole thing.
+Patterns are a method of breaking something up according to a pattern and binding it to names whilst still keeping a reference to the whole thing.
 
 `xs@(x:y:ys)` will match exactly the same thing as `x:y:ys` but the whole list can be accessed via `xs` instead of repeatedly typing `x:y:ys` within
 the function body.
@@ -1054,7 +1057,7 @@ calcBmis xs = [bmi w h | (w, h) <- xs]
 They do not span across guards.
 
 ```haskell
-cyclinder :: (RealFloat a) => a -> a -> a
+cylinder :: (RealFloat a) => a -> a -> a
 cylinder r h =
   let sideArea = 2 * pi * r * h
       topArea = pi * r^2
@@ -1108,14 +1111,14 @@ calcBmis xs = [bmi | (w, h) <- xs, let bmi = w /h^2]
 ```
 
 We use `let` in a similar way to a predicate, the difference being that we do not filter the list.
-The names defined in a `let` are visible to the output function and all predicates and secitons that come after the binding.
+The names defined in a `let` are visible to the output function and all predicates and sections that come after the binding.
 
 ```haskell
 listOverweight :: (RealFloat a) => [(a, a)] -> [a]
 listOverweight xs :: [bmi | (w, h) <- xs, let bmi = w / h^2, bmi >= 25]
 ```
 
-We ommited the `in` part of the binding because the scope of the names is already predefined.
+We omitted the `in` part of the binding because the scope of the names is already predefined.
 If we used `let in`, the names would only be visible to that predicate.
 
 ### Case expressions
@@ -1187,7 +1190,7 @@ maximum' (x:xs) - max x (maximum' xs)
 ### Recursive function Examples
 
 
-**Repliate**
+**Replicate**
 
 ```haskell
 replicate' :: (Num i, Ord i) => i -> a -> [a]
@@ -1717,7 +1720,7 @@ Modules are imported before the definition of any function with the syntax `impo
 
 The `Data.List` module has useful functions for working with lists.
 
-One of thest functions is `numUniques`
+One of these functions is `numUniques`
 
 ```haskell
 numUniques:: (Eq a) => [a] -> Int
@@ -1906,7 +1909,7 @@ The type of `find` is `Maybe a` as it can contain `Just a` or `Nothing`.
 
 **insert** takes an element and a list of elements that can be sorted and inserts it into the last position where it is less than or equal to the next element
 
-**length**, **take**, **drop** **splitAt**, **!!**, and **replicte** all take **Int** as one of their parameters, or return an **Int**.
+**length**, **take**, **drop** **splitAt**, **!!**, and **replicate** all take **Int** as one of their parameters, or return an **Int**.
 They could be more generic if they took any type that's part of **Integral** or **Num**.
 `Data.List` contains **genericLength**, **genericTake** etc to provide these functions without breaking old code.
 
@@ -3501,3 +3504,283 @@ optimalPath roadSystem =
     then reverse bestAPath
     else reverse bestBPath
 ```
+
+## Functors, Applicative Functors, and Monoids
+
+`IO` is an instance of `Functor`. When we `fmap` a function over an IO action, we want to get back an IO action that does the same thing, but has our function applied over its result value.
+
+```haskell
+instance Functor IO where
+  fmap f action = do
+    result <- action
+    return (f result)
+```
+
+The result of mapping over an IO action will be an IO action, so we use the `do` syntax to glue two actions and make a new one.
+We bind the value of `action` and then `return` `f result`, where `return` simply creates an IO action to present the result.
+
+```haskell
+main = do line <- getLine
+          let line' = reverse line
+          putStrLn $ "Reversed " ++ line'
+```
+
+Can be written with `fmap` as 
+
+```haskell 
+main = do line <- fmap reverse getLIne 
+        putStrLn $ "Reversed" ++ line
+
+```
+
+In the same way that we can apply a function to some value residing inside a `Maybe`, we can apply a function to something residing inside an `IO`. 
+
+Another common instance of `Functor` is `(->) r`. 
+The function type `r -> a` can be written as `(->) r a`, so `(->) r` is a partial application, a type constructor which only takes one parameter and can therefore be an instance of `Functor`. 
+
+In `Control.Monad.Instances` we can see the implementation of functions as `Functor`s. 
+
+```haskell 
+instance Functor ((->) r) where 
+  fmap f g = (\x -> f (g x))
+```
+
+Considering `fmap`'s type, `fmap :: (a -> b) -> f a -> f b`, and replacing each of the `f`'s we have `fmap :: (a -> b) -> ((->) r a) -> ((->) r  b)`, and writing in infix we finally have `fmap :: (a -> b) -> (r -> a) -> (r-> b)`.
+
+Mapping a function over a function has to produce a function. 
+This is function composition again. We pipe the output of `r -> a` into `a -> b` giving a function from `r -> b`. 
+
+This could be written as follows 
+
+```haskell 
+instance Functor ((->) r) where 
+  fmap = (.)
+```
+
+We can call `fmap` as an infix function, making its resemblance to `.` clear. 
+
+If we take a function `a ->b` and return `f a -> f b` this is called lifting a function.
+
+```haskell 
+> :t fmap (*2)
+> fmap (*2) :: (Num a, Functor f) => f a -> f a
+> :t fmap (replicate 3)
+> fmap (replicate 3) :: (Functor f) => f a -> f a
+```
+
+The expression `fmap (*2)` is a function that takes a functor `f` over numbers and returns a functor over numbers. That functor could be a list, a `Maybe`, or any other functor type. 
+
+### Applicative functors 
+
+Applicative functors are represented by the `Applicative` typeclass found in `Control.Applicative`. 
+
+```haskell 
+> :t fmap (++) (Just "string")
+> fmap (++) (Just "string") :: Maybe ([Char] -> [Char])
+> :t fmap compare (Just 'a')
+> fmap compare (Just 'a') :: Maybe (Char -> Ordering)
+> :t fmap compare "List of characters."
+> fmap compare "List of characters." :: [Char -> Ordering]
+> :t fmap (\x y z -> x + y / z) [3,4,5,6]
+> fmap (\x y z -> x + y / z) [3,4,5,6] :: (Fractional a) => [a -> a -> a]
+```
+
+If we map `compare`, which has a type of `(Ord a) => a -> a -> Ordering` over a list of characters, we get a list of functions of type `Char -> Ordering`, because the funtion `compare` gets partially applied with the characters in the list. It is not a list of `(Ord a) => a -> Ordering` function, because the first `a` that was applied was a `Char` so the second `a` must be of the same type. 
+
+By mapping "multiple parameter" functions over functors, we get functors which  contain functions inside them. 
+We can map functions that takes these functions as a parameter over them, because whatever is inside a functor will be given to the function that we're mapping over as its parameter. 
+
+```haskell 
+> let a = fmap (*) [1,2,3,4]
+> :t a 
+> a :: [Integer -> Integer] 
+> fmap (\f -> f 9) a
+> [9,18,27,36]
+```
+
+If we have a functor value of `Just (3 *)` and another functor value of `Just 5`, and we wish to apply the function in the first `Just` to the value in the second, we would normally be stuck, as regular functors just support mapping regular functions over existing functors. 
+We could pattern match against the `Just` constructor to get the function out, but we want a more general and abstract way of doing that. 
+
+This is where `Applicative` is used. 
+
+It provides two methods, `pure`, and `<*>`, without a default implementation for either of them. 
+
+```haskell 
+class (Functor f) => Applicative f where 
+  pure :: a -> f a 
+  (<*>) :: f (a -> b) -> f a -> f b
+```
+
+The first line starts the definition of `Applicative` and introduces a class constant. It states that for a type constructor to be part of `Applicative`, it must first be part of `Functor`. 
+
+The first method defined is `pure`. It plays the role of our applicative functor instance here. 
+
+`pure` should take a value of any type and return an applicative functor with that value "inside" it.
+
+The `<*>` function has a similar type declaration to `fmap`. 
+Whereas `fmap` takes a function and a functor and applies the function inside the functor, `<*>` takes a functor that has a function in it and another functor and "extracts" the function from the first functor and then maps it over the second one. 
+
+```haskell 
+instance Applicative Maybe where 
+  pure = Just 
+  Nothing <*> _ = Nothing 
+  (Just f) <*> something = fmap f something
+``` 
+
+From the class definition we see that the `f` plays the role of the applicative functor should take one concrete type as a parameter, so we write `instance Applicative Maybe where` instead of `instance Applicative (Maybe a) where`.
+
+First, `pure` is defined. It is written as `pure = Just` because value constructors like `Just` are normal functions. We could also write `pure x = Just x`. 
+
+Next, `<*>` is defined. We cannot extract a function from `Nothing`, so we pattern match and return nothing.
+
+If the first parameter is not a `Nothing`, then it is a `Just` with some function inside it. The function is extracted and fmap-ed over the second parameter. 
+
+```haskell 
+> Just (+3) <*> Just 9
+> Just 12 
+> pure (+4) <*> Just 10 
+> Just 14 
+> Just (++"string") <*> Nothing 
+> Nothing 
+> Nothing <*> Just "string"
+> Nothing
+```
+
+`pure` can be used when dealing with `Maybe` values in an applicative context, otherwise we can just use `Just`. 
+
+With normal functors, a function can be mapped over a functor and then the result cannot be extracted in any general way, even if the result is a partially applied function. 
+
+Applicative functors alow you to operate on several functors with a single function 
+
+```haskell 
+> pure (+) <*> Just 3 <*> Just 5
+> Just 8 
+> pure (+) <*> Just 3 <*> Nothing
+> Nothing 
+```
+
+`<*>` is left associative, which means that `pure (+) <*> Just 3 <*> Just 5` is the same as `(pure (+) <*> Just 3) <*> Just 5`.
+
+First the `(+)` function is put in a functor, which in this case is just a `Maybe` value, giving `Just (+) <*> Just 3`, the result of which is `Just (3+)`, a partial application.
+Finally, the rest of the calculation is carried out to give `Just 8`.
+
+Applicative functors allows us to take a function that expects parameters that are not necessarily wrapped in functors and use that function to operate on several values that are in functor contexts. 
+
+This is even more useful when we consider that `pure f <*> x` is equal to `fmap f x`, one of the applicative laws. 
+
+`pure` puts a value in a default context. If we just put a function in a default context and then extract and apply it to a value inside another applicative functor, we did the same as mapping that function over that applicative functor. 
+
+`Control.Applicative` therefore exports a function called `<$>`, which is just `fmap` as an infix operator. 
+
+```haskell 
+(<$>) :: (Functor f) => (a -> b) -> f a -> f b  
+f <$> x = fmap f x  
+```
+
+Using `<$>` the applicative style looks much cleaner.
+
+For regular values we might write `f x y z`, and for functors we write `f <$> <*> x <*> y <*> z`.
+
+```haskell 
+> (++) <$> Just "one" <*> Just "two" 
+> Just "onetwo"
+```
+
+First `(++)`, which has a type of `[a] -> [a] -> [a]`, gets mapped over `Just "one"`, resulting in a value of `Just ("one"++)` with a type of `Maybe ([Char] -> [Char])`. 
+
+Now the function is extracted form the `Just` and mapped over `Just "two"`, resulting in `Just "onetwo"`. 
+
+
+List is also an instance of `Applicative` 
+
+```haskell 
+instance Applicative [] where 
+  pure x = [x]
+  fs <*> xs = [f x | f <- fx, x <- xs]
+```
+
+The minimal context for lists is `[]`. `pure` takes a value and puts it in a singleton list, the minimal context for a single value. 
+
+Considering `<*>` for the list type we have `<*> :: [a -> b] -> [a] -> b`.
+This is written as a list comprehension which draws from both lists, applying the function to the values until one or both lists are emptied. 
+
+```haskell 
+> [(*0), (+100), (^2)] <*> [1,2,3]
+> [0,0,0,101,102,103,1,4,9]
+```
+
+If we have a list of functions that takes two parameters, we can apply those functions between two lists 
+
+```haskell 
+> [(+), (*)] <*> [1,2] <*> [3,4]
+> [4,5,5,6,3,4,6,8]
+```
+
+Or we can use a normal function 
+
+```haskell 
+> (++) <$> ["abc", "def", "ghi"] <*> ["?", "!", "."]
+> ["abc?", "abc!", "abc.", "def?", "def!", "def.", "ghi?", "ghi!", "ghi."]
+```
+
+Another instance of `Applicative` is `IO`. 
+
+```haskell 
+instance Applicative IO where 
+  pure = return 
+  a <*> b = do 
+    f <- a 
+    x <- b
+    return (f x)
+```
+
+Since `pure` should place a value in a minimal context, it is just `return`.
+If `<*>` were specialised for `IO` it would have type `(<*>) :: IO (a -> b) -> IO a -> IO b`.
+It would take an IO action that yeilds a function as its result and another IO action and create a new IO action from those that, when performed, first performs the first one to get the function and then performs the second one to get the value, and then it would yield that function applied to the return value as its result. 
+
+```haskell 
+instance Applicative ((->) r) where
+  pure x = (\_ -> x)
+  f <*> g = \x -> f x (g x)
+```
+
+`pure` takes a value and creates a function that ignores its parameter and always returns that value. 
+
+Calling `<*>` with two applictive functors results in an applicative functor, so if we use it on two functions, we get back a function. 
+`(+) <$> (+3) <*> (*100)` makes a function that will use `+` on the results of `(+3)` and `(*100)` and return that. 
+
+Another instance of `Applicative` is `ZipList`, which resides in `Control.Applicative`. 
+
+Rather than applying each function to each value in a pair of lists, we might want to apply its function to the respective position in the second list. 
+
+The `ZipList a` type was introduced because one type cannot have more than one instance. `ZipList` takes a single parameter, a list.
+
+```haskell
+instance Applicative ZipList where 
+  pure x = ZipList (repeat x)
+  ZipList fs <*> ZipList xs = ZipList (zipWith (\f x -> f x) fx xs)
+``` 
+
+`<*>` takes the parameters of the two `ZipList`s, performs a `zipWith` on them, and creates a new `ZipList` with the resulting list.
+
+`ZipList a` does not have a `Show` instance, so we have to use `getZipList` to extract the list. 
+
+`Control.Applicative` defines a function **liftA2** with a type of `liftA2 :: (Applicative f) => (a->b->c) -> f a -> f b -> f c`, which is defined as 
+
+```haskell 
+liftA2 :: (Applicative f) => (a -> b -> c) -> f a -> f b -> f c  
+liftA2 f a b = f <$> a <*> b
+``` 
+
+It applies a function between two applicatives, hiding the applicative style. 
+
+We can say that `liftA2` takes a normal binary function and promotes it to a function that operators on two functors. 
+
+Applicative functor laws
+- `pure id <*> v = v`
+- `pure (.) <*> u <*> v <*> w = u <*> (v <*> w)`
+- `pure f <*> pure x = pure (f x)`
+- `u <*> pure y = pure ($ y) <*> u`
+
+### The newtype keyword 
+

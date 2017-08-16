@@ -24,7 +24,7 @@ title: Tag
             					<a href="tags/#{{ tag | slugify }}"> {{ tag }} </a>
             				 {% endfor %}
             			</p>
-            			<p>{{ post.content | strip_html | truncatewords:50 }}</p>
+            			<p>{{ post.content | split: "<snippet>" | first }}</p>
             	  </li>
               {% endfor %}
           </ul>

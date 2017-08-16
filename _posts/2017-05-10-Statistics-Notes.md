@@ -5,10 +5,15 @@ textcolor: "#FFFFFF"
 tags: [Notes, Statistics]
 ---
 
+Short notes on the AQA statistics A level. 
+
+Split into topics for each module and topic.
+
+<snippet></snippet>
+
 ## SS02
 
 ### Time series analysis
-
 
 #### Seasonal variation
 
