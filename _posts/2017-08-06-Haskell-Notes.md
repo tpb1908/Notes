@@ -3784,3 +3784,232 @@ Applicative functor laws
 
 ### The newtype keyword 
 
+The `newtype` keyword is used when we want to take a type and wrap it in something to present it as another type. 
+
+`ZipList` is defined as follows 
+
+```haskell 
+newtype ZipList a = ZipList { getZipList :: [a] }
+```
+
+Instead of `data`, `newtype` is used. 
+
+`newtype` is faster than `data`, as it does not have the overhead of wrapping and unwrapping when the program is running. 
+When `newtype` is used, Haskell knows that you are just wrapping an existing type into a new type and can get rid of the wrapping and unwrapping. 
+
+`newtype` can only have one value constructor and that value constructor can only have one field. 
+
+We can use the `deriving` keyword with `newtype` to derive instances for `Eq`, `Ord`, `Enum`, `Bounded`, `Show`, and `Read` if the type that we are wrapping belongs to that type class to begin with. 
+
+#### Using newtype to make type class instances
+
+We may want to make our types instances of certain typeclasses, but the type parameters may not match up for what we want to do. 
+
+Suppose we want to make the tuple an instance of `Functor` such that when we `fmap` a function over the tuple, it gets applied to the first component of the tuple. `fmap (+3) (1, 1) = (4, 1)`.
+
+To get around this we can `newtype` our tuple such that the second type parameter represents the type of the first component in the tuple 
+
+```haskell 
+newtype Pair b a = Pair { getPair :: (a, b) }
+```
+
+Now we make it an instance of `Functor` 
+
+```haskell 
+instance Functor (Pair c) where 
+  fmap f (Pair (x, y)) = Pair (f x, y)
+```
+
+We can pattern match on types defined with `newtype`. 
+
+#### newtype laziness 
+
+Consider the following type 
+
+```haskell 
+data BoolData = BoolData { getBoolData :: Bool }
+```
+
+It has one value constructor, which has one field with type `Bool`. 
+
+Now we define a function which takes a `BoolData` as an argument but ignores it. 
+
+```haskell 
+testFunction :: BoolData -> String 
+testFunction (BoolData _) = "string"
+```
+
+Now we pass it `undefined`
+
+```haskell 
+> testFunction undefined
+> Exception: Prelude.undefined
+```
+
+Because types defined with the `data` keyword can have multiple value constructors, Haskell has to evaluate it when checking that it conforms to the `(BoolData _)` pattern.
+
+Instead of `data`, we now use `newtype`. 
+
+```haskell 
+> testFunction undefined
+> "string"
+```
+
+When we use `newtype`, Haskell can internally represent the values of the new type in the same way as the original values. It does not have to add a wrapper around them, instead it only has to be aware of the values being of different types. 
+
+Because Haskell knows that types made with the `newtype` keyword can only have one constructor, it does not have to evaluate the value passed to the function to make sure that it conforms to the pattern.
+
+### Monoids 
+
+Consider `*` which is a function that takes two numbers, and `++`. 
+For `*`, there is the value `1` which can be placed on either side of the operator such that the result is equal to the other parameter.
+For `++`, there is `[]` which will achieve the same thing. 
+
+We can see that `*` and `1`, and `++` and `[]` share some properties 
+
+- The function takes two parameters
+- The parameters and the returned value have the same type 
+- There exists such a value that doesn't change other values when used with the binary function
+
+There is another, less obvious, property which is shared between the functions. 
+
+When we have three or more values and we want to use the binary function to reduce them to a single resultant value, the order in which we apply the binary function to the values does not matter.
+
+```haskell 
+> (3 * 2) * (8 * 5)
+> 240
+> 3 * 2 * 8 * 5
+> 240 
+> "abc" ++ ("def" ++ "ghi")
+> "abcdefghi"
+> "abc" ++ "def" ++ "ghi"
+> "abcdefghi"
+```
+
+This property is called **associativity**.
+
+A monoid, defined in `Data.Monoid` is when you have an associative binary function and a value that acts as an identity with respect to that function. 
+
+```haskell 
+class Monoid m where 
+  mempty :: m
+  mappend :: m -> m -> m
+  mconcat :: [m] -> m 
+  mconcat = foldr mappend mempty
+```
+
+Only concrete types can be made instance of `Monoid`, because the `m` in the type class definition does not take any type parameters. 
+The first function is `mempty`. As it does not take any parameters it is not really a function, it is instead a polymorphic constant.
+`mempty` represents the identify value for a particular monoid. 
+
+`mappend` is the binary function. It takes two values of the same type and produces a return value of that type. 
+
+`mconcat` takes a list of monoid values and reduces them to a single value by doing `mappend` between the list's elements. 
+It has default implementation which takes `mempty` as a starting value and folds right through the list.
+
+
+#### Monoid laws 
+
+- ``mempty `mappend` x = x``
+- ``x `mappend` mempty = x``
+- ``(x `mappend` y) `mappend` z = x `mappend` (y `mappend` z)``
+
+The first two laws state that `mempty` has to act as the identity with repect to `mappend` and the third says that `mappend` has to be associative. 
+
+#### Lists are monoids 
+
+```haskell 
+instance Monoid [a] where
+  mempty = []
+  mappend = (++)
+```
+
+Lists are an instance of the `Monoid` type class regardless of the type of the elements they hold. 
+
+#### Other monoids
+
+Numbers can also be monoids with the `+` function and an identify value of `0`.
+
+The `Data.Monoid` module exports two types for product and sum 
+
+```haskell
+newtype Product a = Product { getProduct :: a } 
+  deriving (Eq, Ord, Read, Show, Bounded)
+
+instance Num a => Monoid (Product a) where 
+  mempty = Product 1
+  Product x `mappend` Product y = Product (x * y)
+```
+
+Another type which can act like a monoid in two distinct but equally valid ways is `Bool`. 
+
+The first is through the `||` function with an identity value of `False`. 
+
+The second is through the `&&` function with an identify value of `True`. 
+
+```haskell 
+instance Monoid Ordering where 
+  mempty = EQ 
+  LT `mappend` _ = LT 
+  EQ `mappend` y = y 
+  GT `mappend` _ = GT
+```
+
+```haskell 
+instance Monoid a => Monoid (Maybe a) where
+  mempty = Nothing 
+  Nothing `mappend` m = m 
+  m `mappend` Nothing = m 
+  Just m1 `mappend` Just m2 = Just (m1 `mappend` m2)
+```
+
+#### Using monoids to fold data structures 
+
+Because there are so many data structures that work nicely with folds, the `Foldable` type class was introduced. 
+
+```haskell 
+> :t foldr 
+> foldr :: (a -> b -> b) -> b -> [a] -> b 
+> :t Foldable.foldr 
+> Foldable.foldr :: (Foldable.Foldable t) => (a -> b -> b) -> b -> t a -> b
+```
+
+Whereas `foldr` takes a list and folds it up, the `foldr` in `Data.Foldable` accepts any type that can be folded up. 
+
+
+```haskell 
+> F.foldl (+) 2 (Just 9)
+> 11 
+> F.foldr (||) False (Just True)
+> True
+```
+
+The `Tree` type defined earlier is 
+
+```haskell
+data Tree a = Empty | Node a (Tree a) (Tree a) deriving (Show, Read, Eq)  
+```
+
+One way to to make `Tree` an instance of `Foldable` is to implement the type constructor,however an easier way is to implement the `foldMap` function. 
+
+```haskell 
+foldMap :: (Monoid m, Foldable t) => (a -> m) -> t a -> m
+```
+
+The first parameter is a function that takes a value of the type that our `Foldable` structure contains, denoted `a`, and returns a monoid vlaue. Its second parameter is a foldable structure that contains a value of type `a`. 
+
+It maps that function over the foldable structure, thus producing a foldable structure that contains monoid values. Then, by doing `mappend` betwen those monoid values it joins them all into a single monoid value. 
+
+```haskell 
+instance F.Foldable Tree where 
+  foldMap f Empty = mempty 
+  foldMap (f Node x l r) = F.foldMap f l `mappend` 
+                           f x           `mappend`
+                           F.foldMap f r 
+```
+
+We are providing a function which takes an element of the tree and returns a monoid value. 
+
+The function recursively traverses the tree and uses `mappend` to join the monoids together. 
+
+
