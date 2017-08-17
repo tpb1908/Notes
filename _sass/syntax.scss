@@ -18,6 +18,10 @@
   padding: 0.5em;
  }
 
+ pre > code {
+  color: #f8f8f2;
+ }
+
  .highlight pre { background-color: #272822; }
  .highlight .hll { background-color: #272822; }
  .highlight .c { color: #75715e } /* Comment */
