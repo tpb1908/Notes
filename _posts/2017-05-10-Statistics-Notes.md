@@ -1,7 +1,5 @@
 ---
 layout: post
-color: "#4caf50"
-textcolor: "#FFFFFF"
 tags: [Notes, Statistics]
 ---
 
