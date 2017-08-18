@@ -4013,3 +4013,230 @@ We are providing a function which takes an element of the tree and returns a mon
 The function recursively traverses the tree and uses `mappend` to join the monoids together. 
 
 
+## Monads 
+
+Monads are an extension of applicative functors.
+
+Suppose you have a value with a context, `m a`. How do you apply to it a function that takes a normal `a` and returns a value with a context. 
+
+That is, applyting a function of type `a -> m b` to a value of type `m b`. 
+
+```haskell 
+(>>=) :: (Monad m) => m a -> (a -> m b) -> m b
+```
+
+Monads are applicative functors that support the `>>=` function, called bind. 
+
+### Maybe
+
+Maybe is a monad. 
+
+In this case `>>=` would take a `Maybe a` value and a function of type `a -> Maybe b` and somehow apply the function to the `Maybe a`. 
+
+Suppose we have a function `\x -> Just (x+1)` which takes a number, adds 1 to it, and wraps it in a `Just`.
+
+Now consider how we might feed a `Maybe` value to this function. 
+
+If the `Maybe` is a `Just` value, we can take the value from the `Just` and apply the function to it. If the value is `Nothing`, then we say the result is nothing. 
+
+
+```haskell 
+applyMaybe :: Maybe a -> (a -> Maybe a) -> Maybe b
+applyMaybe Nothing f = Nothing 
+applyMaybe (Just x) f = f x
+```
+
+### The Monad type class
+
+```haskell 
+class Monad m where 
+  return :: a -> m
+
+  (>>=) :: m a -> (a -> m b) -> m b
+
+  (>>) :: m a -> m b -> m b 
+  x >> y = x >>= \_ -> y
+
+  fail :: String -> m a
+  fail msg = error msg
+```
+
+The first function defined is `return`. It is the same as pure, taking a value and wrapping it in a minimal default context to hold the value. 
+
+The second function is bind. It takes a monadic value and feeds it to a value that takes a normal value and returns a monadic value.
+
+The third function is `>>`. It is rarely implemented because it has a default implementation.
+
+The fourth function is `fail`. It is never used explicitly in code. Instead it is used by Haskell to enable failure in a special syntactic construct for monads. It ignores its input and returns a predetermined monadic value.
+
+```haskell 
+instance Monad Maybe where 
+  return x = Just x
+  Nothing >>= f = Nothing
+  Just x >>= f = f x 
+  fail _ = Nothing
+```
+
+We can use `>>=` repeatedly to handle computations of several `Maybe a` values.
+
+### do notation 
+
+`do` notation can also be used for any monad. Its principle is the same, combining together monadic values in sequence. 
+
+Consider the following expression 
+
+```haskell 
+> Just 3 >>= (\x -> Just "!" >>= (\y -> Just (show x ++ y)))
+> Just "3!"
+```
+
+In the outermost lambda, we feed `Just "!"` to the lambda `\y -> Just (show x ++ y)`. Inside this lambda, `y` becomes `"!"`. `x` is still `3` because we got it from the outer lambda. 
+
+This is similar to the expression 
+
+```haskell 
+> let x = y; y = "!" in show x ++ y
+> "3!"
+```
+
+The main differnce is that the values in the former are monadic, they have a failure context, and any of them can therefore be replaced with a failure value. 
+
+The first example may be written as a function 
+
+```haskell 
+foo :: Maybe String 
+foo = Just 3 >>= (\x ->
+      Just "!" >>= (\y -> 
+      Just (show x ++ y)))
+```
+
+this can instead be written 
+
+```haskell 
+foo :: Maybe String 
+foo = do 
+  x <- Just 3 
+  y <- Just "!"
+  Just (show x ++ y)
+```
+
+We have the ability to temporarily extract things from `Maybe` values without having to check if the `Maybe` values are `Just` or `Nothing` at each step. 
+
+If any of the values are `Nothing`, the whole `do` expression will result in `Nothing`. 
+
+In a `do` expression, every line is a monadic value. To inspect its result we use `<-`. 
+
+### The list monad 
+
+The list can be viewed as one value that is actually many values at the same time. 
+
+```haskell 
+> (*) <$> [1,2,3] <*> [10,100,1000]
+> [10,100,1000,20,200,2000,30,300,3000]
+```
+
+The context of non-determinism translates very well to monads. 
+
+```haskell 
+instance Monad [] where
+  return x = [x]
+  xs >>= f = concat (map f xs)
+  fail _ = []
+```
+
+As usual, `return` packages a value in the minimal context. 
+
+`>>=` maps the function over the values in the list. Each of these calls will preserve the original context (a list), giving a list of lists, which are then concatenated back to a single list. 
+
+```haskell 
+> map (\x -> [x,-x]) [3,4,5]
+> [[3,-3],[4,-4],[5,-5]]
+```
+
+Non determinism also supports failure. The empty list, `[]`, is equivalent to `Nothing`. 
+
+```haskell
+> [] >>= \x -> ["bad","mad","rad"]  
+> []  
+> [1,2,3] >>= \x -> []  
+> []  
+```
+
+We can also chain results in the same way as we did with `Maybe` values. 
+
+When non-deterministic values are interacting, their computation can be viewed as a tree where every possible result in a list represents a separate batch. 
+
+### MonadPlus 
+
+`MonadPlus` is the type class for monads that can also act as monoids. 
+
+```haskell 
+class Monad m => MonadPlus where
+  mzero :: m a 
+  mplus :: m a -> m a -> m a
+```
+
+`mzero` is synonymous with `mempty` in the `Monoid` typeclass and `mplus` corresponds to `mappend`.
+
+```haskell 
+instance MonadPlus [] where
+  mzero = []
+  mplus = (++)
+```
+
+For lists, `mzero` represents a non-deterministic computation that has no results at all. `mplus` joins two non-deterministic values into one. 
+
+```haskell
+guard :: (MonadPls m) => Bool -> m ()
+guard True = return ()
+guard False = mzero
+```
+
+The `guard` function takes a boolan value and if it is `True`, takes a `()` and puts it in a minimal default context that still succeeds. Otherwise, it makes a failed monadic value. 
+
+```haskell 
+> guard (5 > 2) :: Maybe ()
+> Just ()
+> guard (1 > 2) :: Maybe ()
+> Nothing
+> guard (5 > 2) :: [()]
+> [()]
+> guard (1 > 2) :: [()]
+> []
+```
+
+`guard` can be used to filter out non-deterministic computations 
+
+```haskell
+> [ x | x <- [1..50], '7' `elem` show x ]  
+> [7,17,27,37,47]  
+> [1..50] >>= (\x -> guard ('7' `elem` show x) >> return x)
+> [7,17,27,37,47]
+```
+
+The result using `guard` is the same as that from the list comprehension. 
+
+```haskell
+> guard (5 > 2) >> return "string" :: [String]
+> ["string"]
+> guard (1 > 2) >> return "string" :: [String]
+> []
+```
+
+If `guard` succeeds, the result contained within it is an empty tuple. We use `>>` to ignore that empty tuple and present something else as the result. 
+
+If `guard` fails, then so will the `return` later on, because feeding an empty list to a function with `>>=` always result in an empty list. 
+
+The `guard` basically works as follows:
+- If the boolean is `False`, produce a failure value 
+- Otherwise, produce a successful value with a dummy result of `()` inside it
+
+```haskell
+sevens :: [Int]
+sevens = do
+  x <- [1..50]
+  guard ('7' `elem` show x)
+  return x
+```
+
+Without the `return` as the final line in the `do` statement, the resulting list would contain empty tuples.
