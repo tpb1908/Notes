@@ -219,8 +219,9 @@ table, th, td {
 }
 
 .MathJax_Display {
-    overflow-x: auto;
+    overflow-x: scroll;
     overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .post-info {

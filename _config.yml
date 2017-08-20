@@ -1,11 +1,10 @@
 # Site settings
 title: Theo's notes
-description: "A minimal, responsive, ready to use blog template, built with Jekyll."
+description: "Notes on a variety of topics"
 url: "http://www.tpb1908.github.io"
 author:
-  name: "The Review Index"
-  email: "dyutibarma@gmail.com"
-  url: "https://thereviewindex.com"
+  name: "Theo Pearson-Bray"
+  email: "theopearsonbray@gmail.com"
 
 # Build settings
 markdown: kramdown
@@ -33,12 +32,13 @@ gems:
   - jekyll-paginate
   - jekyll-sitemap
   - jekyll-minifier
+  - jekyll-seo-tag
 
 jekyll-minifier:
   exclude: 'atom.xml'
 
 # Custom variables
-version: "1.0.0"
+version: "2.0.0"
 
 # Options
 custom_header: false

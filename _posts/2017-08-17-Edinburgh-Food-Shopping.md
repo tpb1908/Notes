@@ -3,7 +3,7 @@ layout: post
 tags: [Map]
 ---
 
-A Google Map listing the locations of ~150 shops in Edinburgh for buying food.
+A Google Map listing the locations of ~210 shops in Edinburgh for buying food.
 
 <snippet></snippet>
 
