@@ -4240,3 +4240,105 @@ sevens = do
 ```
 
 Without the `return` as the final line in the `do` statement, the resulting list would contain empty tuples.
+
+
+### Chess movement validator
+
+```haskell
+type KnightPos = (Int, Int)
+```
+
+Suppose the knight starts at `(6, 2)`. Can it get to `(6, 1)` in exactly three moves? 
+
+```haskell 
+moveKnight :: KnightPos -> [KnightPos]
+moveKnight (c,r) = do  
+  (c', r') <- [(c+2,r-1),(c+2,r+1),(c-2,r-1),(c-2,r+1)  
+               ,(c+1,r-2),(c+1,r+2),(c-1,r-2),(c-1,r+2)  
+               ] 
+  guard (c' `elem` [1..8] && r' `elem` [1..8])
+  return (c', r')
+```
+
+The knight can always take one step horizontally or vertically and two steps horizontally or vertically, but its movement has to be both horizontal and vertical. 
+
+The guard is used to ensure that the knight is still on the board. 
+
+```haskell
+> moveKnight (6, 2)
+> [(8,1),(8,3),(4,1),(4,3),(7,4),(5,4)]
+> moveKnight (8, 1)
+> [(6,2),(7,3)]
+```
+
+We now have a non-deterministic next position. 
+
+```haskell
+in3 :: KnightPos :: [KnightPos]
+in3 start = do
+  first <- moveKnight start
+  second <- moveKnight first 
+  moveKnight second
+```
+
+This could be written 
+
+```haskell
+in3 start = return start >>= moveKnight >>= moveKnight >>= moveKnight
+```
+
+We can now check if we can move between positions 
+
+```haskell
+canReachIn3 :: KnightPos -> KnightPos -> Bool
+canReachIn3 start end = end `elem` in3 start 
+```
+
+### Monad laws
+
+#### Left identity
+
+The first law states that if we take a value, put it in a default context with `return` and then feed it to a function using `>>=`, it's the same as just taking the value and applying the function to it. 
+
+```haskell 
+return x >>= f = f x
+```
+
+```haskell
+> return 3 >>= (\x -> Just (x+100))
+> Just 103
+> (\x -> Just (x+100))
+> Just 103
+```
+
+#### Right identity
+
+The second law states that if we have a monadic value and we use `>>=` to feed it into `return`, the result is our original monadic value 
+
+```haskell
+m >>= return = m
+```
+
+```haskell
+> Just "string" >>= (\x -> return x)
+> Just "string"
+> [1,2,3,4] >>= (\x -> return x)
+```
+
+#### Associativity 
+
+The final monad law says that when we have a chain of monadic function applications with `>>=`, it should not matter how they are nested. 
+
+`(m >>= f) >>= g` is the same as `m >>= (\x -> f x >>= g)` 
+
+In the example above, we have one monadic value `m`, and two monadic functions `f` and `g`.
+
+When we write `(m >>= f) >>= g` we are feeding `m` to `f`, resulting in a monadic value which is then fed through `g`.
+
+When we write `m >>= (\x -> f x >>= g)` we take a monadic value and feed it to a function that feeds the result of `f x` to `g`. 
+
+```haskell
+(<=<) :: (Monad m) => (b -> m c) -> (a -> m b) -> (a -> m c)
+f <=< g = (\x -> g x >>= f)
+```
+
